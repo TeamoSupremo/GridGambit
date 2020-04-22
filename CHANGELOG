@@ -1,5 +1,10 @@
--------- 22/04 --------
+
+-------- WEEK 1 --------
+22/04
 Initial project created
 
 [Nathan]
-Added XML with sizing and constriants for main menu buttons
+Added XML with sizing and constraints for main menu buttons
+
+[Josh]
+Added XML layout for achievements, level selector and information screens
