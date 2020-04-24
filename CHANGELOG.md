@@ -8,3 +8,10 @@
 
 [Josh]
 - Added XML layout for achievements, level selector and information screens
+
+
+### 24/04
+
+[Nathan]
+- Added Navigation/Intents for achivement, gamescreen and level selection activities, added player and achievement class
+
