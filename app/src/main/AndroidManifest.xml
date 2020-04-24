@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".InfoScreen"></activity>
+        <activity android:name=".GameScreen"></activity>
+        <activity android:name=".InfoScreen" />
         <activity android:name=".LevelMenu" />
         <activity android:name=".AchievementsScreen" />
         <activity android:name=".MainActivity">
