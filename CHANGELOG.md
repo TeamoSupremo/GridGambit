@@ -13,5 +13,10 @@
 ### 24/04
 
 [Nathan]
-- Added Navigation/Intents for achivement, gamescreen and level selection activities, added player and achievement class
+- Added Navigation/Intents for achivement, gamescreen and level selection activities, added player and achievement clas
+
+### 25/04
+
+[Josh]
+- Added achievements json file, added level class
 
