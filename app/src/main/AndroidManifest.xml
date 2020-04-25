@@ -13,6 +13,7 @@
         <activity android:name=".InfoScreen" />
         <activity android:name=".LevelMenu" />
         <activity android:name=".AchievementsScreen" />
+        <activity android:name=".Level" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

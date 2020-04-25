@@ -1,0 +1,22 @@
+{
+  "achievements" : [
+    {
+      "title" : "ACHIEVEMENT 1",
+      "name" : "achievement1",
+      "description" : "achievement description 1",
+      "points" : 100
+    },
+    {
+      "title" : "ACHIEVEMENT 2",
+      "name" : "achievement2",
+      "description" : "achievement description 2",
+      "points" : 100
+    },
+    {
+      "title" : "ACHIEVEMENT 3",
+      "name" : "achievement3",
+      "description" : "achievement description 3",
+      "points" : 100
+    }
+  ]
+}

@@ -9,6 +9,6 @@ public class LevelMenu extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.level_menu);
+//        setContentView(R.layout.level_menu);
     }
 }
