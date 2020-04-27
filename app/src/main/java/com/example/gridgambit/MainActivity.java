@@ -30,4 +30,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LevelMenu.class);
         startActivity(intent);
     }
+
+    public void loadEndlessMode(View view) {
+        Player.PlayerInfo.isEndless = true;
+        Intent intent = new Intent(this, GameScreen.class);
+        startActivity(intent);
+    }
 }

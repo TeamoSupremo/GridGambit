@@ -92,6 +92,7 @@
         android:paddingStart="0dp"
         android:text="Endless Mode"
         android:textStyle="bold"
+        android:onClick="loadEndlessMode"
         app:layout_constraintBottom_toTopOf="@+id/achievementsButton"
         android:paddingRight="19dp"
         android:paddingLeft="0dp" />
