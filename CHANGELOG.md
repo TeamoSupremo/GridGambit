@@ -25,3 +25,10 @@
 [Josh]
 - Added XML for endless mode, added navigation/intent for endless mode
 
+### 30/04
+[Nathan]
+- Added class for grid items 'GridTextView'
+- Added 4x4 hardcoded grid items
+- added xml drawable for grid layout
+
+
