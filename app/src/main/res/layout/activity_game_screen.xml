@@ -141,8 +141,10 @@
         android:id="@+id/game_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/value_text_background"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="0dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
