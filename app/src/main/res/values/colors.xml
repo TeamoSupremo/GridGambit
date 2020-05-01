@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#A5A6B5</color>
+    <color name="colorPrimaryDark">#1D1D22</color>
+    <color name="colorAccent">#383B57</color>
+    <color name="goodHover">#339933</color>
+    <color name="badHover">#993333</color>
+    <color name="textColour">#c6c6bc</color>
+    <color name="headingTextColour">#66ddff</color>
+    <color name="gridItemColour">#c0c0b6</color>
 </resources>
