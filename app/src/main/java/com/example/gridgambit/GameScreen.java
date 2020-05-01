@@ -4,12 +4,17 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.DragEvent;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -22,6 +27,7 @@ public class GameScreen extends AppCompatActivity {
     private static final float ITEM_MARGIN_MODIFIER_TOP = 0.1f;
     private static final float GAME_MARGIN_MODIFIER = 0.025f;
 
+    @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +100,8 @@ public class GameScreen extends AppCompatActivity {
                 itemParams.topMargin = (int) ((width * ITEM_MARGIN_MODIFIER_TOP) / 4);
                 gridItem.xLocation = j;
                 gridItem.yLocation = i;
+                gridItem.setOnTouchListener(new gridTouchListener());
+                gridItem.setOnDragListener(new gridDragListener());
                 row.addView(gridItem);
             }
             levelUI.gameLayout.addView(row);
@@ -110,5 +118,62 @@ public class GameScreen extends AppCompatActivity {
                 (int) (width * GAME_MARGIN_MODIFIER));
 
         levelUI.gameLayout.setLayoutParams(paramsGameLayout);
+    }
+    private static final class gridTouchListener implements View.OnTouchListener {
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @SuppressLint({"ClickableViewAccessibility"})
+        @Override
+        //start drag
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                ClipData data = ClipData.newPlainText("", "");
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                v.startDragAndDrop(data, shadowBuilder, v, 0);
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    private static final class gridDragListener implements View.OnDragListener {
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            GridTextView movingSquare = (GridTextView) event.getLocalState();
+            GridTextView goalSquare;
+            final int action = event.getAction();
+
+            switch(action) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    return true;
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    goalSquare = (GridTextView) v;
+                    movingSquare.firstMatch = goalSquare.getValue();
+                    movingSquare.firstMatchObject = goalSquare;
+                    // TODO: Matching with multiple objects
+                    return true;
+                case DragEvent.ACTION_DRAG_EXITED:
+                    // TODO: Matching object needs to be unassigned if receding
+                    return true;
+                case DragEvent.ACTION_DROP:
+                    goalSquare = (GridTextView) v;
+                    Level.LevelInfo.currentTurns--;
+                    int sequence = movingSquare.getValue() + movingSquare.firstMatch;
+                    String sequenceString = sequence + "";
+                    goalSquare.setText(sequenceString);
+                    Level.LevelInfo.currentScore += sequence;
+                    movingSquare.matches = 0;
+                    movingSquare.firstMatchObject = null;
+                    return true;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    goalSquare = (GridTextView) v;
+                    return true;
+                default:
+                    break;
+            }
+            return false;
+        }
     }
 }
