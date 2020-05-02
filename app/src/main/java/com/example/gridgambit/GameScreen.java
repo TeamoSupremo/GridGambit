@@ -87,7 +87,8 @@ public class GameScreen extends AppCompatActivity {
                 // TODO: create background for gridItem
                 GridTextView gridItem = new GridTextView(this);
                 // TODO: set gridItem text based on level
-                gridItem.setText("1");
+                int gridText = j % 2;
+                gridItem.setText("" + gridText);
                 gridItem.setTextColor(Color.parseColor("#1f1f2a"));
                 // Center text
                 gridItem.setGravity(Gravity.CENTER);
@@ -150,22 +151,97 @@ public class GameScreen extends AppCompatActivity {
                     return true;
                 case DragEvent.ACTION_DRAG_ENTERED:
                     goalSquare = (GridTextView) v;
-                    movingSquare.firstMatch = goalSquare.getValue();
-                    movingSquare.firstMatchObject = goalSquare;
-                    // TODO: Matching with multiple objects
+                    int nextMatchNumber = movingSquare.matches + 1;
+                    switch(movingSquare.matches) {
+                        case 0:
+                        if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare, nextMatchNumber)) {
+                            movingSquare.firstMatch = goalSquare.getValue();
+                            movingSquare.firstMatchObject = goalSquare;
+                            movingSquare.matches++;
+                            return true;
+                        }
+                            break;
+                        case 1:
+                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.firstMatchObject, goalSquare, nextMatchNumber)) {
+                                //references to matching items
+                                movingSquare.secondMatch = goalSquare.getValue();
+                                movingSquare.secondMatchObject = goalSquare;
+                                movingSquare.matches++;
+                                return true;
+                            }
+                            else {
+                                movingSquare.matches--;
+                            }
+                            break;
+                        case 2:
+                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.secondMatchObject, goalSquare, nextMatchNumber)) {
+                                //references to matching items
+                                movingSquare.thirdMatch = goalSquare.getValue();
+                                movingSquare.thirdMatchObject = goalSquare;
+                                movingSquare.matches++;
+                                return true;
+                            }
+                            else {
+                                movingSquare.matches--;
+                            }
+                            break;
+                        case 3:
+                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.thirdMatchObject, goalSquare, nextMatchNumber)) {
+                                movingSquare.matches++;
+                                return true;
+                            } else {
+                                movingSquare.matches--;
+                            }
+                            return true;
+                    }
                     return true;
                 case DragEvent.ACTION_DRAG_EXITED:
                     // TODO: Matching object needs to be unassigned if receding
                     return true;
                 case DragEvent.ACTION_DROP:
                     goalSquare = (GridTextView) v;
-                    Level.LevelInfo.currentTurns--;
-                    int sequence = movingSquare.getValue() + movingSquare.firstMatch;
-                    String sequenceString = sequence + "";
-                    goalSquare.setText(sequenceString);
-                    Level.LevelInfo.currentScore += sequence;
+                    switch (movingSquare.matches) {
+
+                        case 1:
+                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare)) {
+                                Level.LevelInfo.currentTurns--;
+                                //total value for element and score
+                                int sequence = movingSquare.getValue() + movingSquare.firstMatch;
+                                String sequenceString = sequence + "";
+                                //change value displayed to be the total value of all matches
+                                goalSquare.setText(sequenceString);
+                                Level.LevelInfo.currentScore += sequence;
+
+                            }
+                            break;
+                        case 2:
+                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.firstMatchObject, goalSquare)) {
+                                Level.LevelInfo.currentTurns--;
+                                //total value for element and score
+                                int sequence = movingSquare.getValue() + movingSquare.firstMatch + movingSquare.secondMatch;
+                                String sequenceString = sequence + "";
+                                //change value displayed to be the total value of all matches
+                                goalSquare.setText(sequenceString);
+                                Level.LevelInfo.currentScore += sequence;
+                            }
+                            break;
+                        case 3:
+                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.secondMatchObject, goalSquare)) {
+                                Level.LevelInfo.currentTurns--;
+                                //total value for element and score
+                                int sequence = movingSquare.getValue() + movingSquare.firstMatch + movingSquare.secondMatch + movingSquare.thirdMatch;
+                                String sequenceString = sequence + "";
+                                //change value displayed to be the total value of all matches
+                                goalSquare.setText(sequenceString);
+                                Level.LevelInfo.currentScore += sequence;
+                            }
+
+                    }
+                    //remove any references to older matches
                     movingSquare.matches = 0;
                     movingSquare.firstMatchObject = null;
+                    movingSquare.secondMatchObject = null;
+                    movingSquare.thirdMatchObject = null;
                     return true;
                 case DragEvent.ACTION_DRAG_ENDED:
                     goalSquare = (GridTextView) v;
