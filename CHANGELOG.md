@@ -38,3 +38,13 @@
 - Added drawables for sound and info
 - Updated landing page with neater menus
 
+[Nathan]
+- Added touch event listeners
+- Dragging a block onto another will now sum them
+
+### 2/5
+[Nathan]
+- Matching now works for 2 blocks with an absolute difference of 1
+
+
+
