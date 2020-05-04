@@ -46,5 +46,11 @@
 [Nathan]
 - Matching now works for 2 blocks with an absolute difference of 1
 
+# Week 3
+### 4/5
+[Josh]
+- Mathed out levels as discussed
+- Added levels.json
+- Working on achievements
 
 
