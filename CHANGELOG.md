@@ -53,4 +53,9 @@
 - Added levels.json
 - Working on achievements
 
+### 5/5
+- Added DataManager class
+- Added loading of levels from json file
+- Changed creation of grid items to use numbers from json file
+
 
