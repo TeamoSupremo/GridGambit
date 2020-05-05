@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import org.json.JSONException;
+
 import java.util.Locale;
 
 public class GameScreen extends AppCompatActivity {
@@ -54,72 +56,90 @@ public class GameScreen extends AppCompatActivity {
             levelUI.scoreRow.removeView(levelUI.targetText);
         }
 
-        // Get display metrics for dynamic grid sizing
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int width = displayMetrics.widthPixels;
-        System.out.println(width);
+        levelUI.data = DataManager.loadLevels(getApplicationContext());
 
-        // Set grid items to be 80% of screen width
-        int newWidth = (int) (width * 0.8) / 4;
-        int newHeight = (int) (width * 0.8) / 4;
-        int textSize = (int) (newWidth / 5);
-        Level.LevelInfo.gridSize = 4;
+        try {
+            //assign level info from JSON
+            Level.LevelInfo.grid = levelUI.data.getJSONArray("value");
+            Level.LevelInfo.currentTurns = levelUI.data.getInt("turns");
+            Level.LevelInfo.targetScore = levelUI.data.getInt("score");
 
+            //if the square root of the total number of values is an integer, our grid will be evenly sized
+            if (Math.sqrt(Level.LevelInfo.grid.length()) == (int) Math.sqrt(Level.LevelInfo.grid .length())) {
 
-        // Assign info UI params
-        levelUI.infoLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(newWidth, newHeight);
-
-        // Create grid rows
-        // TODO: Change to grid size depending on level
-        for (int i = 0; i < 4; i++) {
-            System.out.println(levelUI.gameLayout);
-            System.out.println(i);
-            LinearLayout row = new LinearLayout(this);
-            row.setLayoutParams(params);
-            row.setOrientation(LinearLayout.HORIZONTAL);
-
-            // Fill grid rows
-            for (int j = 0; j < 4; j++) {
-                // TODO: scale gridItem size based on level
-                // TODO: create background for gridItem
-                GridTextView gridItem = new GridTextView(this);
-                // TODO: set gridItem text based on level
-                int gridText = j % 2;
-                gridItem.setText("" + gridText);
-                gridItem.setTextColor(Color.parseColor("#1f1f2a"));
-                // Center text
-                gridItem.setGravity(Gravity.CENTER);
-                gridItem.setTextSize(textSize);
-                gridItem.setBackgroundColor(Color.LTGRAY);
-                gridItem.setMaxLines(1);
-                gridItem.setLayoutParams(itemParams);
-                itemParams.leftMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / 4);
-                itemParams.rightMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / 4);
-                itemParams.topMargin = (int) ((width * ITEM_MARGIN_MODIFIER_TOP) / 4);
-                gridItem.xLocation = j;
-                gridItem.yLocation = i;
-                gridItem.setOnTouchListener(new gridTouchListener());
-                gridItem.setOnDragListener(new gridDragListener());
-                row.addView(gridItem);
+                //assign square root as grid size
+                Level.LevelInfo.gridSize = (int) Math.sqrt(Level.LevelInfo.grid.length());
             }
-            levelUI.gameLayout.addView(row);
+
+            // Get display metrics for dynamic grid sizing
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int width = displayMetrics.widthPixels;
+            System.out.println(width);
+
+            // Set grid items to be 80% of screen width
+            int newWidth = (int) (width * 0.8) / Level.LevelInfo.gridSize;
+            int newHeight = (int) (width * 0.8) / Level.LevelInfo.gridSize;
+            int textSize = (int) (newWidth / 5);
+
+
+            // Assign info UI params
+            levelUI.infoLayout.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(newWidth, newHeight);
+
+            // Create grid rows
+            // TODO: Change to grid size depending on level
+            for (int i = 0; i < Level.LevelInfo.gridSize; i++) {
+                System.out.println(levelUI.gameLayout);
+                System.out.println(i);
+                LinearLayout row = new LinearLayout(this);
+                row.setLayoutParams(params);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+
+                // Fill grid rows
+                for (int j = 0; j < Level.LevelInfo.gridSize; j++) {
+                    // TODO: scale gridItem size based on level
+                    // TODO: create background for gridItem
+                    GridTextView gridItem = new GridTextView(this);
+                    gridItem.setText(String.format(Locale.getDefault(), "%d", Level.LevelInfo.grid.getInt(j + (i * Level.LevelInfo.gridSize))));
+                    // TODO: set gridItem text based on level
+                    int gridText = j % 2;
+                    gridItem.setTextColor(Color.parseColor("#1f1f2a"));
+                    // Center text
+                    gridItem.setGravity(Gravity.CENTER);
+                    gridItem.setTextSize(textSize);
+                    gridItem.setBackgroundColor(Color.LTGRAY);
+                    gridItem.setMaxLines(1);
+                    gridItem.setLayoutParams(itemParams);
+                    itemParams.leftMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
+                    itemParams.rightMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
+                    itemParams.topMargin = (int) ((width * ITEM_MARGIN_MODIFIER_TOP) / Level.LevelInfo.gridSize);
+                    gridItem.xLocation = j;
+                    gridItem.yLocation = i;
+                    gridItem.setOnTouchListener(new gridTouchListener());
+                    gridItem.setOnDragListener(new gridDragListener());
+                    row.addView(gridItem);
+                }
+                levelUI.gameLayout.addView(row);
+            }
+            ConstraintLayout.LayoutParams paramsGameLayout = (ConstraintLayout.LayoutParams) levelUI.gameLayout.getLayoutParams();
+            paramsGameLayout.leftMargin = (int) (width * GAME_MARGIN_MODIFIER);
+            paramsGameLayout.rightMargin = (int) (width * GAME_MARGIN_MODIFIER);
+            paramsGameLayout.bottomMargin = (int) (width * GAME_MARGIN_MODIFIER);
+
+            levelUI.gameLayout.setPadding(
+                    (int) (width * GAME_MARGIN_MODIFIER),
+                    (int) (width * GAME_MARGIN_MODIFIER),
+                    (int) (width * GAME_MARGIN_MODIFIER),
+                    (int) (width * GAME_MARGIN_MODIFIER));
+
+            levelUI.gameLayout.setLayoutParams(paramsGameLayout);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        ConstraintLayout.LayoutParams paramsGameLayout = (ConstraintLayout.LayoutParams) levelUI.gameLayout.getLayoutParams();
-        paramsGameLayout.leftMargin = (int) (width * GAME_MARGIN_MODIFIER);
-        paramsGameLayout.rightMargin = (int) (width * GAME_MARGIN_MODIFIER);
-        paramsGameLayout.bottomMargin = (int) (width * GAME_MARGIN_MODIFIER);
-
-        levelUI.gameLayout.setPadding(
-                (int) (width * GAME_MARGIN_MODIFIER),
-                (int) (width * GAME_MARGIN_MODIFIER),
-                (int) (width * GAME_MARGIN_MODIFIER),
-                (int) (width * GAME_MARGIN_MODIFIER));
-
-        levelUI.gameLayout.setLayoutParams(paramsGameLayout);
     }
+
     private static final class gridTouchListener implements View.OnTouchListener {
 
         @RequiresApi(api = Build.VERSION_CODES.N)
