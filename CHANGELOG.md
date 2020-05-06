@@ -59,4 +59,8 @@
 - Added loading of levels from json file
 - Changed creation of grid items to use numbers from json file
 
+### 6/5
+[Josh]
+- Created level menu from levels.json
+
 

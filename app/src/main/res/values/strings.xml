@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Grid Gambit</string>
+    <string name="level_text"> Level: </string>
 </resources>
