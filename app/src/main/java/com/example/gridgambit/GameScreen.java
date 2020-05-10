@@ -63,6 +63,7 @@ public class GameScreen extends AppCompatActivity {
             Level.LevelInfo.grid = levelUI.data.getJSONArray("value");
             Level.LevelInfo.currentTurns = levelUI.data.getInt("turns");
             Level.LevelInfo.targetScore = levelUI.data.getInt("score");
+            GridUtil.updateUI(levelUI, getApplicationContext());
 
             //if the square root of the total number of values is an integer, our grid will be evenly sized
             if (Math.sqrt(Level.LevelInfo.grid.length()) == (int) Math.sqrt(Level.LevelInfo.grid .length())) {
@@ -103,7 +104,6 @@ public class GameScreen extends AppCompatActivity {
                     // TODO: create background for gridItem
                     GridTextView gridItem = new GridTextView(this);
                     gridItem.setText(String.format(Locale.getDefault(), "%d", Level.LevelInfo.grid.getInt(j + (i * Level.LevelInfo.gridSize))));
-                    // TODO: set gridItem text based on level
                     int gridText = j % 2;
                     gridItem.setTextColor(Color.parseColor("#1f1f2a"));
                     // Center text
@@ -158,7 +158,7 @@ public class GameScreen extends AppCompatActivity {
 
     }
 
-    private static final class gridDragListener implements View.OnDragListener {
+    private final class gridDragListener implements View.OnDragListener {
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
@@ -231,7 +231,7 @@ public class GameScreen extends AppCompatActivity {
                                 //change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
-
+                                GridUtil.updateUI(levelUI, getApplicationContext());
                             }
                             break;
                         case 2:
@@ -243,6 +243,7 @@ public class GameScreen extends AppCompatActivity {
                                 //change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
+                                GridUtil.updateUI(levelUI, getApplicationContext());
                             }
                             break;
                         case 3:
@@ -254,6 +255,7 @@ public class GameScreen extends AppCompatActivity {
                                 //change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
+                                GridUtil.updateUI(levelUI, getApplicationContext());
                             }
 
                     }

@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Grid Gambit</string>
     <string name="level_text"> Level: </string>
+    <string name="turns_text"> Turns: </string>
+    <string name="score_text"> Score: </string>
+    <string name="target_text"> Target: </string>
+    <string name="main_menu">Main Menu</string>
 </resources>
