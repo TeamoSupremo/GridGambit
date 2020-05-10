@@ -31,7 +31,7 @@
 - Added 4x4 hardcoded grid items
 - added xml drawable for grid layout
 
-### 1/5
+### 1/05
 [Josh]
 - Updated Colour palette
 - Overhauled layouts with correct colours
@@ -42,25 +42,32 @@
 - Added touch event listeners
 - Dragging a block onto another will now sum them
 
-### 2/5
+### 2/05
 [Nathan]
 - Matching now works for 2 blocks with an absolute difference of 1
 
 # Week 3
-### 4/5
+### 4/05
 [Josh]
 - Mathed out levels as discussed
 - Added levels.json
 - Working on achievements
 
-### 5/5
+### 5/05
 [Nathan]
 - Added DataManager class
 - Added loading of levels from json file
 - Changed creation of grid items to use numbers from json file
 
-### 6/5
+### 6/05
 [Josh]
 - Created level menu from levels.json
+
+# Week 4
+### 10/05
+[Nathan]
+- Added function to GridUtil for updating UI
+- Made game UI update after each turn (score, turns left, etc)
+- Changed main menu screen to dark
 
 
