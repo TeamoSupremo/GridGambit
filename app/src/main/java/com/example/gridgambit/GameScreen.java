@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ClipData;
 import android.graphics.Color;
 import android.os.Build;
@@ -28,11 +29,13 @@ public class GameScreen extends AppCompatActivity {
     private static final float ITEM_MARGIN_MODIFIER = 0.05f;
     private static final float ITEM_MARGIN_MODIFIER_TOP = 0.1f;
     private static final float GAME_MARGIN_MODIFIER = 0.025f;
+    private Activity gs;
 
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        gs = this;
         super.onCreate(savedInstanceState);
 
         // Assign UI references
@@ -160,6 +163,7 @@ public class GameScreen extends AppCompatActivity {
 
     private final class gridDragListener implements View.OnDragListener {
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public boolean onDrag(View v, DragEvent event) {
             GridTextView movingSquare = (GridTextView) event.getLocalState();
@@ -264,6 +268,8 @@ public class GameScreen extends AppCompatActivity {
                     movingSquare.firstMatchObject = null;
                     movingSquare.secondMatchObject = null;
                     movingSquare.thirdMatchObject = null;
+                    // TODO: Change to wincheck
+                    GridUtil.loseCheck(getApplicationContext(), levelUI, gs);
                     return true;
                 case DragEvent.ACTION_DRAG_ENDED:
                     goalSquare = (GridTextView) v;

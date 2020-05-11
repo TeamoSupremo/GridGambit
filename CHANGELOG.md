@@ -70,4 +70,9 @@
 - Made game UI update after each turn (score, turns left, etc)
 - Changed main menu screen to dark
 
+### 11/05
+[Josh]
+- Added check to see if grid has moves
+- Added check for losing
+- Added options for replaying same level or returning to main menu
 

@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">Grid Gambit</string>
     <string name="level_text"> Level: </string>
+    <string name="retry">Retry</string>
+    <string name="next_level">Next Level</string>
     <string name="turns_text"> Turns: </string>
+    <string name="lf_gridlock">Level Failed: Grid Lock!</string>
+    <string name="gridlock">Grid Lock!</string>
+    <string name="lf_no_more_turns">Level Failed: No More Turns!</string>
     <string name="score_text"> Score: </string>
     <string name="target_text"> Target: </string>
     <string name="main_menu">Main Menu</string>
