@@ -268,8 +268,7 @@ public class GameScreen extends AppCompatActivity {
                     movingSquare.firstMatchObject = null;
                     movingSquare.secondMatchObject = null;
                     movingSquare.thirdMatchObject = null;
-                    // TODO: Change to wincheck
-                    GridUtil.loseCheck(getApplicationContext(), levelUI, gs);
+                    GridUtil.winCheck(getApplicationContext(), levelUI, gs);
                     return true;
                 case DragEvent.ACTION_DRAG_ENDED:
                     goalSquare = (GridTextView) v;

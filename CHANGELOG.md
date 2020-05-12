@@ -76,3 +76,7 @@
 - Added check for losing
 - Added options for replaying same level or returning to main menu
 
+### 12/5
+[Josh]
+- Added check for level complete
+
