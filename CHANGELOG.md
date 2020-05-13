@@ -80,3 +80,9 @@
 [Josh]
 - Added check for level complete
 
+
+### 13/5
+[Nathan]
+- Added powerup resources
+- Charge bar now filled based on score at 4:1 rate
+
