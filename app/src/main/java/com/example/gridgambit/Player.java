@@ -12,6 +12,8 @@ public class Player {
         static int level = 0;
         static int levelHighest = 0;
         static boolean levelPassed = false;
+        static int powerCharge = 0;
+        static boolean powerActivated = false;
 
         PlayerInfo() {
             achievement = new Achievement();

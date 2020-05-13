@@ -17,6 +17,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import org.json.JSONException;
@@ -32,12 +33,19 @@ public class GameScreen extends AppCompatActivity {
     private Activity gs;
 
     @SuppressLint("ClickableViewAccessibility")
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         gs = this;
         super.onCreate(savedInstanceState);
 
+        //reset power-ups charge
+        Player.PlayerInfo.powerCharge = 0;
+        //reset players score
+        Level.LevelInfo.currentScore = 0;
+
+        if (Player.PlayerInfo.level == 17){
+            Level.LevelInfo.currentScore = 100;
+        }
         // Assign UI references
         levelUI = new Level();
         setContentView(R.layout.activity_game_screen);
@@ -47,6 +55,7 @@ public class GameScreen extends AppCompatActivity {
         levelUI.levelText = findViewById(R.id.level_text);
         levelUI.scoreText = findViewById(R.id.score_text);
         levelUI.targetText = findViewById(R.id.target_text);
+        levelUI.powerChargeBar = findViewById(R.id.charge_progress_bar);
         levelUI.turnsLevelRow = (LinearLayout) levelUI.turnsText.getParent();
         levelUI.scoreRow = (LinearLayout) levelUI.scoreText.getParent();
         levelUI.soundButton = findViewById(R.id.sound_button);
@@ -140,6 +149,12 @@ public class GameScreen extends AppCompatActivity {
             levelUI.gameLayout.setLayoutParams(paramsGameLayout);
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+        LinearLayout chargeBar = findViewById(R.id.charge_bar_layout);
+        LinearLayout chargeBarParent = (LinearLayout) chargeBar.getParent();
+        //if player is passed level 3 then add the charge bar back
+        if(Player.PlayerInfo.level >= 3 && chargeBar.getParent() == null){
+            chargeBarParent.addView(chargeBar);
         }
     }
 
@@ -235,6 +250,7 @@ public class GameScreen extends AppCompatActivity {
                                 //change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
+                                Player.PlayerInfo.powerCharge += sequence * 4;
                                 GridUtil.updateUI(levelUI, getApplicationContext());
                             }
                             break;
@@ -247,6 +263,7 @@ public class GameScreen extends AppCompatActivity {
                                 //change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
+                                Player.PlayerInfo.powerCharge += sequence * 4;
                                 GridUtil.updateUI(levelUI, getApplicationContext());
                             }
                             break;
@@ -259,9 +276,30 @@ public class GameScreen extends AppCompatActivity {
                                 //change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
+                                Player.PlayerInfo.powerCharge += sequence * 4;
                                 GridUtil.updateUI(levelUI, getApplicationContext());
                             }
-
+                            break;
+                    }
+                    //if charge is full and player hasn't activated power-up
+                    if (levelUI.powerChargeBar.getProgress() == 100 && !Player.PlayerInfo.powerActivated) {
+                        //switch background
+                        Button powerButton = findViewById(R.id.power_charge_button);
+                        // TODO: Change colour or drawable of charge bar here
+                    }
+                    //if power is active and player has made a match
+                    if (Player.PlayerInfo.powerActivated && movingSquare.matches != 0) {
+                        //deactivate power up and reduce charge to 0
+                        Player.PlayerInfo.powerActivated = false;
+                        Player.PlayerInfo.powerCharge = 0;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            levelUI.powerChargeBar.setProgress(Player.PlayerInfo.powerCharge, true);
+                        }
+                        //switch UI back to normal
+                        Button powerButton = findViewById(R.id.power_charge_button);
+                        // TODO: Revert colour or drawable of charge bar here
+                        LinearLayout chargeLayout = findViewById(R.id.charge_bar_layout);
+                        chargeLayout.setBackground(getDrawable(R.drawable.value_text_background));
                     }
                     //remove any references to older matches
                     movingSquare.matches = 0;

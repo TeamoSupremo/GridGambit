@@ -34,9 +34,19 @@ public class GridUtil {
                         (movingItem.yLocation == goalItem.yLocation && Math.abs(movingItem.xLocation - goalItem.xLocation) == matchNumber));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public static void updateUI(Level levelUI, Context context){
+        //make sure charge doesn't go over 100
+        if(Player.PlayerInfo.powerCharge > 100){
+            Player.PlayerInfo.powerCharge = 100;
+        }
+        if(Player.PlayerInfo.powerCharge < 0){
+            Player.PlayerInfo.powerCharge = 0;
+        }
 
         levelUI.scoreText.setText(String.format(Locale.getDefault(),"%s %d", context.getString(R.string.score_text), Level.LevelInfo.currentScore));
+        levelUI.powerChargeBar.setProgress(Player.PlayerInfo.powerCharge, true);
+        levelUI.powerChargeBar.jumpDrawablesToCurrentState();
         try {
             levelUI.turnsText.setText(String.format(Locale.getDefault(),"%s %d", context.getString(R.string.turns_text), Level.LevelInfo.currentTurns));
             levelUI.targetText.setText(String.format(Locale.getDefault(),"%s %d", context.getString(R.string.target_text), Level.LevelInfo.targetScore));
@@ -115,9 +125,6 @@ public class GridUtil {
             mainMenuButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-                    Level.LevelInfo.soundPool.release();
-                    Level.LevelInfo.soundPool = null;
-
                     Intent intent = new Intent(v.getContext(), MainActivity.class);
                     context.startActivity(intent);
                     activity.finish();
@@ -156,8 +163,6 @@ public class GridUtil {
             nextLevelButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-                    Level.LevelInfo.soundPool.release();
-                    Level.LevelInfo.soundPool = null;
                     // TODO: add save player data
                     Player.PlayerInfo.levelPassed = false;
                     Intent intent = new Intent(v.getContext(), GameScreen.class);
@@ -242,7 +247,6 @@ public class GridUtil {
 
         if(Level.LevelInfo.currentTurns < 1 || gridLock){
             // TODO: Add lose sound
-
             LinearLayout loseScreen = new LinearLayout(context);
             Button retryButton = new Button(context);
             retryButton.setText(R.string.retry);
