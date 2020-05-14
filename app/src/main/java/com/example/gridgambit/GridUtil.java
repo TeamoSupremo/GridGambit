@@ -126,6 +126,7 @@ public class GridUtil {
 
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                     activity.finish();
 
@@ -273,6 +274,7 @@ public class GridUtil {
                 public void onClick(View v) {
                     // TODO: release sounds
                     Intent intent = new Intent(v.getContext(), GameScreen.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                     activity.finish();
                 }
@@ -285,6 +287,7 @@ public class GridUtil {
                     //TODO: save player info in data manager
                     Player.PlayerInfo.levelPassed = false;
                     Intent intent = new Intent(v.getContext(), GameScreen.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                     activity.finish();
                 }
@@ -295,6 +298,7 @@ public class GridUtil {
                 public void onClick(View v) {
 
                     Intent intent = new Intent(v.getContext(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                     activity.finish();
                 }

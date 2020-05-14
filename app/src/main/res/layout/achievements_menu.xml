@@ -34,10 +34,10 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
-                android:background="#FFFFFF"
+                android:background="@drawable/value_text_background"
                 android:layout_weight="1"
                 android:textColor="@color/colorPrimary"
-                android:text="Achievement Points" />
+                android:text="@string/achievement_points" />
         </LinearLayout>
     </ScrollView>
 

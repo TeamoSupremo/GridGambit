@@ -40,9 +40,6 @@
         app:layout_constraintBottom_toTopOf="@+id/endlessModeButton"
         android:id="@+id/challenge_mode_layout">
 
-
-
-
         <Button
             android:id="@+id/challengeModeButton"
             android:layout_width="match_parent"

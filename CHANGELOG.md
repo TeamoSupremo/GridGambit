@@ -80,9 +80,14 @@
 [Josh]
 - Added check for level complete
 
-
 ### 13/5
 [Nathan]
 - Added powerup resources
 - Charge bar now filled based on score at 4:1 rate
 
+### 14/5
+[Josh]
+- Updated achievement.json with actual achievements
+- Made achievement screen load achievements from json and display
+- Updated level button on main screen to show current player level
+- Changed fonts for game squares and achievements menu

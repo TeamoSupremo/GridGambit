@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -32,6 +33,7 @@ public class GameScreen extends AppCompatActivity {
     private static final float GAME_MARGIN_MODIFIER = 0.025f;
     private Activity gs;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,9 @@ public class GameScreen extends AppCompatActivity {
             Level.LevelInfo.currentTurns = levelUI.data.getInt("turns");
             Level.LevelInfo.targetScore = levelUI.data.getInt("score");
             GridUtil.updateUI(levelUI, getApplicationContext());
+
+            Typeface face = Typeface.createFromAsset(getAssets(),
+                    "font/akashi.ttf");
 
             //if the square root of the total number of values is an integer, our grid will be evenly sized
             if (Math.sqrt(Level.LevelInfo.grid.length()) == (int) Math.sqrt(Level.LevelInfo.grid .length())) {
@@ -123,6 +128,7 @@ public class GameScreen extends AppCompatActivity {
                     gridItem.setTextSize(textSize);
                     gridItem.setBackgroundColor(Color.LTGRAY);
                     gridItem.setMaxLines(1);
+                    gridItem.setTypeface(face);
                     gridItem.setLayoutParams(itemParams);
                     itemParams.leftMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
                     itemParams.rightMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
@@ -178,7 +184,7 @@ public class GameScreen extends AppCompatActivity {
 
     private final class gridDragListener implements View.OnDragListener {
 
-        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public boolean onDrag(View v, DragEvent event) {
             GridTextView movingSquare = (GridTextView) event.getLocalState();
