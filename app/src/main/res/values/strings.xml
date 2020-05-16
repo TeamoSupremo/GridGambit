@@ -7,6 +7,7 @@
     <string name="lf_gridlock">Level Failed: Grid Lock!</string>
     <string name="gridlock">Grid Lock!</string>
     <string name="finish">Last Level Complete!</string>
+    <string name="achievement_points">Achievement Points: </string>
     <string name="lf_no_more_turns">Level Failed: No More Turns!</string>
     <string name="score_text"> Score: </string>
     <string name="target_text"> Target: </string>

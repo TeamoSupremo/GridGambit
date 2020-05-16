@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,5 +35,13 @@ public class MainActivity extends AppCompatActivity {
         Player.PlayerInfo.isEndless = true;
         Intent intent = new Intent(this, GameScreen.class);
         startActivity(intent);
+    }
+
+    public void onResume() {
+        super.onResume();
+        Button levelButton = findViewById(R.id.levelButton);
+        // Display current level
+        levelButton.setText(String.valueOf(Player.PlayerInfo.level + 1));
+        // TODO: Add sound button info
     }
 }
