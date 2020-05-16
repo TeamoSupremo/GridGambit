@@ -91,3 +91,10 @@
 - Made achievement screen load achievements from json and display
 - Updated level button on main screen to show current player level
 - Changed fonts for game squares and achievements menu
+
+### 16/5
+[Nathan]
+- Added icons for charge bar
+- Icons change on pressing charge bar
+- Charge bar now usuable at full charge
+- Snackbar displays message on activation
