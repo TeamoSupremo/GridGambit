@@ -1,5 +1,7 @@
 package com.example.gridgambit;
 import com.example.gridgambit.DataManager;
+import com.google.android.material.snackbar.Snackbar;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,13 +25,13 @@ import java.util.Locale;
 
 public class GridUtil {
     public static boolean matchCanBeMadeWith(GridTextView movingItem, GridTextView previousGoalItem, GridTextView goalItem){
-        return Math.abs(goalItem.getValue() - previousGoalItem.getValue()) == 1 &&
+        return (Math.abs(goalItem.getValue() - previousGoalItem.getValue()) == 1 || Player.PlayerInfo.powerActivated) &&
                 ((movingItem.xLocation == goalItem.xLocation && Math.abs(movingItem.yLocation - goalItem.yLocation) == movingItem.matches) ||
                         (movingItem.yLocation == goalItem.yLocation && Math.abs(movingItem.xLocation - goalItem.xLocation) == movingItem.matches));
     }
 
     public static boolean matchCanBeMadeWith(GridTextView movingItem, GridTextView previousGoalItem, GridTextView goalItem, int matchNumber){
-        return Math.abs(goalItem.getValue() - previousGoalItem.getValue()) == 1 &&
+        return (Math.abs(goalItem.getValue() - previousGoalItem.getValue()) == 1 || Player.PlayerInfo.powerActivated) &&
                 ((movingItem.xLocation == goalItem.xLocation && Math.abs(movingItem.yLocation - goalItem.yLocation) == matchNumber) ||
                         (movingItem.yLocation == goalItem.yLocation && Math.abs(movingItem.xLocation - goalItem.xLocation) == matchNumber));
     }
@@ -345,6 +347,33 @@ public class GridUtil {
             ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
             loseScreen.setLayoutParams(params);
             loseScreen.setGravity(Gravity.END | Gravity.CENTER);
+        }
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public static void executeCharge(View view, Level levelUI, Context context){
+
+        if(Player.PlayerInfo.powerActivated && levelUI.powerChargeBar.getProgress() == 100){
+            Player.PlayerInfo.powerActivated = false;
+            Snackbar powerSB = Snackbar.make(view, "Power Deactivated", Snackbar.LENGTH_SHORT);
+            View v = powerSB.getView();
+            TextView txtv = v.findViewById(R.id.snackbar_text);
+            txtv.setGravity(Gravity.CENTER_HORIZONTAL);
+            txtv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            powerSB.show();
+            view.setBackground(context.getDrawable(R.drawable.value_text_background));
+        }
+
+        else if(levelUI.powerChargeBar.getProgress() == 100) {
+            Player.PlayerInfo.powerActivated = true;
+            Snackbar powerSB = Snackbar.make(view, "Power Activated", Snackbar.LENGTH_SHORT);
+            View v = powerSB.getView();
+            TextView txtv = v.findViewById(R.id.snackbar_text);
+            txtv.setGravity(Gravity.CENTER_HORIZONTAL);
+            txtv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            powerSB.show();
+            view.setBackground(context.getDrawable(R.drawable.layout_charge_active));
         }
     }
 }

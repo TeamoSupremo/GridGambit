@@ -32,6 +32,7 @@ public class GameScreen extends AppCompatActivity {
     private static final float GAME_MARGIN_MODIFIER = 0.025f;
     private Activity gs;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -285,7 +286,7 @@ public class GameScreen extends AppCompatActivity {
                     if (levelUI.powerChargeBar.getProgress() == 100 && !Player.PlayerInfo.powerActivated) {
                         //switch background
                         Button powerButton = findViewById(R.id.power_charge_button);
-                        // TODO: Change colour or drawable of charge bar here
+                        powerButton.setBackground(getDrawable(R.drawable.charge_button_drawable));
                     }
                     //if power is active and player has made a match
                     if (Player.PlayerInfo.powerActivated && movingSquare.matches != 0) {
@@ -297,7 +298,7 @@ public class GameScreen extends AppCompatActivity {
                         }
                         //switch UI back to normal
                         Button powerButton = findViewById(R.id.power_charge_button);
-                        // TODO: Revert colour or drawable of charge bar here
+                        powerButton.setBackground(getDrawable(R.drawable.noncharge_button_drawable));
                         LinearLayout chargeLayout = findViewById(R.id.charge_bar_layout);
                         chargeLayout.setBackground(getDrawable(R.drawable.value_text_background));
                     }
@@ -316,5 +317,8 @@ public class GameScreen extends AppCompatActivity {
             }
             return false;
         }
+    }
+    public void executeCharge(View view){
+        GridUtil.executeCharge(view, levelUI, getApplicationContext());
     }
 }
