@@ -76,23 +76,23 @@
 - Added check for losing
 - Added options for replaying same level or returning to main menu
 
-### 12/5
+### 12/05
 [Josh]
 - Added check for level complete
 
-### 13/5
+### 13/05
 [Nathan]
 - Added powerup resources
 - Charge bar now filled based on score at 4:1 rate
 
-### 14/5
+### 14/05
 [Josh]
 - Updated achievement.json with actual achievements
 - Made achievement screen load achievements from json and display
 - Updated level button on main screen to show current player level
 - Changed fonts for game squares and achievements menu
 
-### 16/5
+### 16/05
 [Nathan]
 - Added icons for charge bar
 - Icons change on pressing charge bar
