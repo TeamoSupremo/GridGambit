@@ -11,6 +11,7 @@ public class Player {
         static boolean isEndless = false;
         static int level = 0;
         static int levelHighest = 0;
+        static int soundLevel = 1;
         static boolean levelPassed = false;
         static int powerCharge = 0;
         static boolean powerActivated = false;

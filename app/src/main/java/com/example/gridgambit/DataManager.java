@@ -5,10 +5,34 @@ import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class DataManager {
+    public static void savePlayerInfo(Context context){
+        FileOutputStream out;
+        File file = new File(context.getFilesDir(), "/" + "player_info");
+        StringBuilder achievements = new StringBuilder();
+        try {
+            out = new FileOutputStream(file, false);
+            for(int i = 0; i < Player.PlayerInfo.achievements.size(); i++){
+                achievements.append(",");
+                achievements.append(Player.PlayerInfo.achievements.values().toArray()[i]);
+            }
+            String fileContents = Player.PlayerInfo.level + "," +
+                    Player.PlayerInfo.levelHighest +
+                    achievements;
+
+            byte[] contents = fileContents.getBytes();
+            out.write(contents);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static JSONObject loadLevels(Context context){
 
         String json = null;

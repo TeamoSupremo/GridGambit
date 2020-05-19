@@ -97,6 +97,24 @@ public class GridUtil {
         return gridLock;
     }
 
+    private static void achievementCheck(Context context){
+        //if the player beats level 10 and the difficulty is on easy
+        if ((!Player.PlayerInfo.isEndless) && Player.PlayerInfo.level >= 20) {
+            //award the first achievement
+            Player.PlayerInfo.achievements.put("master", true);
+        }
+
+        if(Player.PlayerInfo.level == 3 && Level.LevelInfo.currentTurns == 3){
+            Player.PlayerInfo.achievements.put("halfLife3Confirmed", true);
+        }
+
+        if(Level.LevelInfo.currentTurns == 0){
+            Player.PlayerInfo.achievements.put("EZ", true);
+        }
+
+        DataManager.savePlayerInfo(context);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void winCheck(final Context context, final Level levelUI, final Activity activity){
 

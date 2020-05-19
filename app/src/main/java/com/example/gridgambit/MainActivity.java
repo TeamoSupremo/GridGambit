@@ -1,10 +1,13 @@
 package com.example.gridgambit;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import com.example.gridgambit.Player.PlayerInfo;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,11 +40,35 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void muteSound(View view){
+
+        Button soundButton = findViewById(R.id.sound_button);
+
+        if(PlayerInfo.soundLevel == 1) {
+            PlayerInfo.soundLevel = 0;
+            soundButton.setBackground(getDrawable(R.drawable.sound_muted));
+        }
+        else{
+            PlayerInfo.soundLevel = 1;
+            soundButton.setBackground(getDrawable(R.drawable.sound));
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void onResume() {
         super.onResume();
         Button levelButton = findViewById(R.id.levelButton);
         // Display current level
         levelButton.setText(String.valueOf(Player.PlayerInfo.level + 1));
-        // TODO: Add sound button info
+        Button soundButton = findViewById(R.id.sound_button);
+
+        if (PlayerInfo.soundLevel == 1) {
+
+            soundButton.setBackground(getDrawable(R.drawable.sound));
+
+        } else {
+            soundButton.setBackground(getDrawable(R.drawable.sound_muted));
+        }
     }
 }

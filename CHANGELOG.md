@@ -96,5 +96,13 @@
 [Nathan]
 - Added icons for charge bar
 - Icons change on pressing charge bar
-- Charge bar now usuable at full charge
+- Charge bar now usable at full charge
 - Snackbar displays message on activation
+
+# Week 5
+### 19/05
+[Josh]
+- Added SoundManager Class
+- Added onclick to sound button
+- Added drawable for muted sound
+- Added achievement check to GridUtil

@@ -323,7 +323,13 @@ public class GameScreen extends AppCompatActivity {
             return false;
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void executeCharge(View view){
         GridUtil.executeCharge(view, levelUI, getApplicationContext());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void muteSound(View view){
+        SoundManager.muteSound(view, gs, getApplicationContext());
     }
 }
