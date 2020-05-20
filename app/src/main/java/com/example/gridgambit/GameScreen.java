@@ -7,8 +7,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -19,7 +22,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONException;
 
@@ -34,7 +40,7 @@ public class GameScreen extends AppCompatActivity {
     private Activity gs;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "RestrictedApi"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         gs = this;
@@ -93,7 +99,6 @@ public class GameScreen extends AppCompatActivity {
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int width = displayMetrics.widthPixels;
-            System.out.println(width);
 
             // Set grid items to be 80% of screen width
             int newWidth = (int) (width * 0.8) / Level.LevelInfo.gridSize;
@@ -107,37 +112,37 @@ public class GameScreen extends AppCompatActivity {
             LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(newWidth, newHeight);
 
             // Create grid rows
-            // TODO: Change to grid size depending on level
             for (int i = 0; i < Level.LevelInfo.gridSize; i++) {
-                System.out.println(levelUI.gameLayout);
-                System.out.println(i);
                 LinearLayout row = new LinearLayout(this);
                 row.setLayoutParams(params);
                 row.setOrientation(LinearLayout.HORIZONTAL);
 
                 // Fill grid rows
                 for (int j = 0; j < Level.LevelInfo.gridSize; j++) {
-                    // TODO: scale gridItem size based on level
-                    // TODO: create background for gridItem
                     GridTextView gridItem = new GridTextView(this);
                     gridItem.setText(String.format(Locale.getDefault(), "%d", Level.LevelInfo.grid.getInt(j + (i * Level.LevelInfo.gridSize))));
-                    int gridText = j % 2;
                     gridItem.setTextColor(Color.parseColor("#1f1f2a"));
                     // Center text
                     gridItem.setGravity(Gravity.CENTER);
                     gridItem.setTextSize(textSize);
-                    gridItem.setBackgroundColor(Color.LTGRAY);
+                    // TODO: fix text tize using "setAutoSizeTextTypeUniformWithConfiguration"
+                    //gridItem.setAutoSizeTextTypeUniformWithConfiguration(textSize / 3, textSize, 15, TypedValue.COMPLEX_UNIT_PX);
                     gridItem.setMaxLines(1);
                     gridItem.setTypeface(face);
                     gridItem.setLayoutParams(itemParams);
                     itemParams.leftMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
                     itemParams.rightMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
                     itemParams.topMargin = (int) ((width * ITEM_MARGIN_MODIFIER_TOP) / Level.LevelInfo.gridSize);
+                    gridItem.setBackground(getDrawable(R.drawable.grid_item));
+                    //add colour filter to background for match colouring
+                    gridItem.getBackground().setColorFilter(Color.rgb(gridItem.redInBackground, gridItem.greenInBackground, gridItem.blueInBackground), PorterDuff.Mode.OVERLAY);
                     gridItem.xLocation = j;
                     gridItem.yLocation = i;
                     gridItem.setOnTouchListener(new gridTouchListener());
                     gridItem.setOnDragListener(new gridDragListener());
+                    GridUtil.updateGridItemColour(gridItem);
                     row.addView(gridItem);
+                    row.setBaselineAligned(false);
                 }
                 levelUI.gameLayout.addView(row);
             }
@@ -158,6 +163,9 @@ public class GameScreen extends AppCompatActivity {
         }
         LinearLayout chargeBar = findViewById(R.id.charge_bar_layout);
         LinearLayout chargeBarParent = (LinearLayout) chargeBar.getParent();
+        if(Player.PlayerInfo.level < 4 && !Player.PlayerInfo.isEndless) {
+            chargeBarParent.removeView(chargeBar);
+        }
         //if player is passed level 3 then add the charge bar back
         if(Player.PlayerInfo.level >= 3 && chargeBar.getParent() == null){
             chargeBarParent.addView(chargeBar);
@@ -200,10 +208,16 @@ public class GameScreen extends AppCompatActivity {
                     switch(movingSquare.matches) {
                         case 0:
                         if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare, nextMatchNumber)) {
+                            updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), movingSquare);
+                            updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
                             movingSquare.firstMatch = goalSquare.getValue();
                             movingSquare.firstMatchObject = goalSquare;
                             movingSquare.matches++;
                             return true;
+                        } else {
+                            if (goalSquare != movingSquare) {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
+                            }
                         }
                             break;
                         case 1:
@@ -215,6 +229,8 @@ public class GameScreen extends AppCompatActivity {
                                 return true;
                             }
                             else {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
                                 movingSquare.matches--;
                             }
                             break;
@@ -227,6 +243,9 @@ public class GameScreen extends AppCompatActivity {
                                 return true;
                             }
                             else {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.secondMatchObject);
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
                                 movingSquare.matches--;
                             }
                             break;
@@ -235,13 +254,20 @@ public class GameScreen extends AppCompatActivity {
                                 movingSquare.matches++;
                                 return true;
                             } else {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.secondMatchObject);
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.thirdMatchObject);
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
                                 movingSquare.matches--;
                             }
                             return true;
                     }
                     return true;
                 case DragEvent.ACTION_DRAG_EXITED:
-                    // TODO: Matching object needs to be unassigned if receding
+                    goalSquare = (GridTextView) v;
+                    if (goalSquare != movingSquare.firstMatchObject && goalSquare != movingSquare.secondMatchObject && goalSquare != movingSquare.thirdMatchObject) {
+                        updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), goalSquare);
+                    }
                     return true;
                 case DragEvent.ACTION_DROP:
                     goalSquare = (GridTextView) v;
@@ -258,6 +284,8 @@ public class GameScreen extends AppCompatActivity {
                                 Level.LevelInfo.currentScore += sequence;
                                 Player.PlayerInfo.powerCharge += sequence * 4;
                                 GridUtil.updateUI(levelUI, getApplicationContext());
+                                GridUtil.updateGridItemColour(movingSquare);
+                                GridUtil.updateGridItemColour(goalSquare);
                             }
                             break;
                         case 2:
@@ -271,6 +299,9 @@ public class GameScreen extends AppCompatActivity {
                                 Level.LevelInfo.currentScore += sequence;
                                 Player.PlayerInfo.powerCharge += sequence * 4;
                                 GridUtil.updateUI(levelUI, getApplicationContext());
+                                GridUtil.updateGridItemColour(goalSquare);
+                                GridUtil.updateGridItemColour(movingSquare);
+                                GridUtil.updateGridItemColour(movingSquare.firstMatchObject);
                             }
                             break;
                         case 3:
@@ -284,6 +315,10 @@ public class GameScreen extends AppCompatActivity {
                                 Level.LevelInfo.currentScore += sequence;
                                 Player.PlayerInfo.powerCharge += sequence * 4;
                                 GridUtil.updateUI(levelUI, getApplicationContext());
+                                GridUtil.updateGridItemColour(goalSquare);
+                                GridUtil.updateGridItemColour(movingSquare);
+                                GridUtil.updateGridItemColour(movingSquare.firstMatchObject);
+                                GridUtil.updateGridItemColour(movingSquare.secondMatchObject);
                             }
                             break;
                     }
@@ -316,6 +351,8 @@ public class GameScreen extends AppCompatActivity {
                     return true;
                 case DragEvent.ACTION_DRAG_ENDED:
                     goalSquare = (GridTextView) v;
+                    goalSquare.setBackground(getDrawable(R.drawable.grid_item));
+                    GridUtil.updateGridItemColour(goalSquare);
                     return true;
                 default:
                     break;
@@ -331,5 +368,10 @@ public class GameScreen extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void muteSound(View view){
         SoundManager.muteSound(view, gs, getApplicationContext());
+    }
+
+    void updateBackgroundAndFilter(Drawable background, GridTextView gridItem){
+        gridItem.setBackground(background);
+        gridItem.getBackground().setColorFilter(Color.rgb(gridItem.redInBackground, gridItem.greenInBackground, gridItem.blueInBackground), PorterDuff.Mode.OVERLAY);
     }
 }

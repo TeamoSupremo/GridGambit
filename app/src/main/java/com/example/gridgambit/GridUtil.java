@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
@@ -370,6 +371,53 @@ public class GridUtil {
             loseScreen.setLayoutParams(params);
             loseScreen.setGravity(Gravity.END | Gravity.CENTER);
         }
+    }
+
+    //changes colour based on value in gridItem
+    public static void updateGridItemColour(GridTextView gridItem){
+        //blue
+        if(gridItem.getValue() <= 12){
+            gridItem.redInBackground = (200 - gridItem.getValue() * 15);
+            gridItem.greenInBackground = (200 - gridItem.getValue() * 15);
+            gridItem.blueInBackground = (gridItem.getValue() * 8 + 180);
+
+            if(gridItem.blueInBackground >= 255){
+
+                gridItem.blueInBackground = 255;
+            }
+        }
+        //purple
+        else if(gridItem.getValue() <= 24){
+            gridItem.redInBackground = (gridItem.getValue() * 8);
+            gridItem.greenInBackground = 50;
+            gridItem.blueInBackground = 255;
+
+        }
+        //red
+        else if(gridItem.getValue() <= 36){
+            gridItem.redInBackground = (50 + gridItem.getValue() * 5);
+            gridItem.greenInBackground = 0;
+            gridItem.blueInBackground = (int) (255 * (1 - (gridItem.getValue() / 36.0)));
+        }
+        //orange
+        else if(gridItem.getValue() <= 48){
+            gridItem.redInBackground = 255;
+            gridItem.greenInBackground = ((gridItem.getValue() - 36) * 15);
+            gridItem.blueInBackground = 0;
+
+            if(gridItem.greenInBackground >= 255){
+
+                gridItem.greenInBackground = 255;
+            }
+        }
+        //yellow -> white
+        else{
+            gridItem.redInBackground = 255;
+            gridItem.greenInBackground = 180;
+            gridItem.blueInBackground = gridItem.getValue() / 10;
+        }
+
+        gridItem.getBackground().setColorFilter(Color.rgb(gridItem.redInBackground, gridItem.greenInBackground, gridItem.blueInBackground), PorterDuff.Mode.OVERLAY);
     }
 
 

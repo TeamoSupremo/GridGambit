@@ -13,6 +13,10 @@ public class GridTextView extends AppCompatTextView {
     int firstMatch = 0;
     int secondMatch = 0;
     int thirdMatch = 0;
+    int redInBackground = 192;
+    int greenInBackground = 192;
+    int blueInBackground = 182;
+
 
     GridTextView firstMatchObject;
     GridTextView secondMatchObject;
