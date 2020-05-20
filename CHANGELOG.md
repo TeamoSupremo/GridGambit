@@ -106,3 +106,10 @@
 - Added onclick to sound button
 - Added drawable for muted sound
 - Added achievement check to GridUtil
+
+### 20/05
+[Nathan]
+- Added method for updating colour of grid items
+- Added drawables for: grid item shape, good match overlay, bad match overlay
+- Grid items will now change colour after each successful match
+- Grid items now have green border when hovering over matchable item, or red if not
