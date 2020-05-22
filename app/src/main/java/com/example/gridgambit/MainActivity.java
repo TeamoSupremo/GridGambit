@@ -10,14 +10,55 @@ import android.view.View;
 import android.widget.Button;
 import com.example.gridgambit.Player.PlayerInfo;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
     SoundPool sp;
+    PlayerInfo pi = new PlayerInfo();
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sp = new SoundPool.Builder().setMaxStreams(5).build();
+        System.out.print("resetting PlayerInfo: ");
+        System.out.println(pi);
+        File file = new File(this.getFilesDir(), "player_info");
+        sp = new SoundPool.Builder().setMaxStreams(5).build();
+        Level.LevelInfo.menuClickId = sp.load(this, R.raw.match_made, 1);
+        FileInputStream is;
+        try {
+            is = openFileInput(file.getName());
+            StringBuffer fileContent = new StringBuffer();
+            InputStreamReader isr = new InputStreamReader(is) ;
+            BufferedReader buffReader = new BufferedReader(isr) ;
+            String readString = buffReader.readLine() ;
+
+            while (readString != null)
+            {
+                fileContent.append(readString);
+                readString = buffReader.readLine();
+            }
+
+            String unfilteredPlayerData = String.valueOf(fileContent);
+            String[] playerData = unfilteredPlayerData.split(",");
+
+            PlayerInfo.level = Integer.parseInt(playerData[0]);
+            PlayerInfo.levelHighest = Integer.parseInt(playerData[1]);
+
+            for(int i = 0; i < PlayerInfo.achievements.size(); i++){
+                StringBuilder objectConverter = new StringBuilder();
+                objectConverter.append(Objects.requireNonNull(PlayerInfo.achievements.keySet().toArray())[i]);
+                String stringBoolean = String.valueOf(objectConverter);
+                PlayerInfo.achievements.put(stringBoolean, Boolean.parseBoolean(playerData[i+2]));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void loadChallengeMode(View view) {
