@@ -119,3 +119,6 @@
 - Added sounds
 - Attached sounds to most game actions
 
+[Nathan]
+- saved progress now loads on opening the app
+
