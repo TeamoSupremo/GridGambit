@@ -7,11 +7,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -26,7 +28,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import com.example.gridgambit.Level.LevelInfo;
+import com.example.gridgambit.Player.PlayerInfo;
 import org.json.JSONException;
 
 import java.util.Locale;
@@ -45,6 +48,17 @@ public class GameScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         gs = this;
         super.onCreate(savedInstanceState);
+
+        LevelInfo.soundPool = new SoundPool.Builder().setMaxStreams(5).build();
+        //load sounds
+        LevelInfo.matchMadeSoundId = LevelInfo.soundPool.load(this, R.raw.match_made, 1);
+        LevelInfo.gridItemStaticFailSoundId = LevelInfo.soundPool.load(this, R.raw.match_two, 1);
+        LevelInfo.powerActivatedSoundId = LevelInfo.soundPool.load(this, R.raw.power_up_two_trimmed, 1);
+        LevelInfo.powerDeactivatedSoundId = LevelInfo.soundPool.load(this, R.raw.power_up_three_trimmed, 1);
+        LevelInfo.powerReadySoundId = LevelInfo.soundPool.load(this, R.raw.power_up_ready, 1);
+        LevelInfo.powerUsedSoundId = LevelInfo.soundPool.load(this, R.raw.match_three, 1);
+        LevelInfo.winSoundId = LevelInfo.soundPool.load(this, R.raw.win_one, 1);
+        LevelInfo.loseSoundId = LevelInfo.soundPool.load(this, R.raw.lose, 1);
 
         //reset power-ups charge
         Player.PlayerInfo.powerCharge = 0;
@@ -67,6 +81,14 @@ public class GameScreen extends AppCompatActivity {
         levelUI.turnsLevelRow = (LinearLayout) levelUI.turnsText.getParent();
         levelUI.scoreRow = (LinearLayout) levelUI.scoreText.getParent();
         levelUI.soundButton = findViewById(R.id.sound_button);
+
+        //draw sound icon as regular or muted depending on whether user has already muted before starting game
+        if (PlayerInfo.soundLevel == 1) {
+            levelUI.soundButton.setBackground(getDrawable(R.drawable.sound));
+
+        } else {
+            levelUI.soundButton.setBackground(getDrawable(R.drawable.sound_muted));
+        }
 
         // Remove UI elements if endless mode is on
         if(Player.PlayerInfo.isEndless){
@@ -187,7 +209,6 @@ public class GameScreen extends AppCompatActivity {
             }
             return false;
         }
-
     }
 
     private final class gridDragListener implements View.OnDragListener {
@@ -201,57 +222,78 @@ public class GameScreen extends AppCompatActivity {
 
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    return true;
+                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                        //play sound and update background
+                        LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+                        updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), movingSquare);
+                        return true;
+                    }
+                    return false;
                 case DragEvent.ACTION_DRAG_ENTERED:
                     goalSquare = (GridTextView) v;
                     int nextMatchNumber = movingSquare.matches + 1;
-                    switch(movingSquare.matches) {
+                    switch (movingSquare.matches) {
                         case 0:
-                        if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare, nextMatchNumber)) {
-                            updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), movingSquare);
-                            updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
-                            movingSquare.firstMatch = goalSquare.getValue();
-                            movingSquare.firstMatchObject = goalSquare;
-                            movingSquare.matches++;
-                            return true;
-                        } else {
-                            if (goalSquare != movingSquare) {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
+                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare, nextMatchNumber)) {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), movingSquare);
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
+                                //references to matching items
+                                movingSquare.firstMatch = goalSquare.getValue();
+                                movingSquare.firstMatchObject = goalSquare;
+                                movingSquare.matches++;
+                                //matching sound
+                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+                                return true;
+                            } else {
+                                if (goalSquare != movingSquare) {
+                                    updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
+                                    LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+                                }
                             }
-                        }
                             break;
                         case 1:
                             if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.firstMatchObject, goalSquare, nextMatchNumber)) {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
                                 //references to matching items
                                 movingSquare.secondMatch = goalSquare.getValue();
                                 movingSquare.secondMatchObject = goalSquare;
                                 movingSquare.matches++;
+                                //matching sound
+                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                                 return true;
-                            }
-                            else {
+                            } else {
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
+                                System.out.println("bad applied to: " + goalSquare.xLocation + goalSquare.yLocation);
                                 movingSquare.matches--;
+                                //matching sound
+                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                             }
                             break;
                         case 2:
                             if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.secondMatchObject, goalSquare, nextMatchNumber)) {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
                                 //references to matching items
                                 movingSquare.thirdMatch = goalSquare.getValue();
                                 movingSquare.thirdMatchObject = goalSquare;
                                 movingSquare.matches++;
+                                //matching sound
+                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                                 return true;
-                            }
-                            else {
+                            } else {
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.secondMatchObject);
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
                                 movingSquare.matches--;
+                                //matching sound
+                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                             }
                             break;
                         case 3:
                             if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.thirdMatchObject, goalSquare, nextMatchNumber)) {
+                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
                                 movingSquare.matches++;
+                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                                 return true;
                             } else {
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
@@ -259,6 +301,8 @@ public class GameScreen extends AppCompatActivity {
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.thirdMatchObject);
                                 updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
                                 movingSquare.matches--;
+                                //matching sound
+                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                             }
                             return true;
                     }
@@ -276,6 +320,7 @@ public class GameScreen extends AppCompatActivity {
                         case 1:
                             if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare)) {
                                 Level.LevelInfo.currentTurns--;
+                                LevelInfo.soundPool.play(LevelInfo.matchMadeSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                                 //total value for element and score
                                 int sequence = movingSquare.getValue() + movingSquare.firstMatch;
                                 String sequenceString = sequence + "";
@@ -291,6 +336,7 @@ public class GameScreen extends AppCompatActivity {
                         case 2:
                             if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.firstMatchObject, goalSquare)) {
                                 Level.LevelInfo.currentTurns--;
+                                LevelInfo.soundPool.play(LevelInfo.matchMadeSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                                 //total value for element and score
                                 int sequence = movingSquare.getValue() + movingSquare.firstMatch + movingSquare.secondMatch;
                                 String sequenceString = sequence + "";
@@ -307,6 +353,7 @@ public class GameScreen extends AppCompatActivity {
                         case 3:
                             if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.secondMatchObject, goalSquare)) {
                                 Level.LevelInfo.currentTurns--;
+                                LevelInfo.soundPool.play(LevelInfo.matchMadeSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                                 //total value for element and score
                                 int sequence = movingSquare.getValue() + movingSquare.firstMatch + movingSquare.secondMatch + movingSquare.thirdMatch;
                                 String sequenceString = sequence + "";
@@ -327,6 +374,11 @@ public class GameScreen extends AppCompatActivity {
                         //switch background
                         Button powerButton = findViewById(R.id.power_charge_button);
                         powerButton.setBackground(getDrawable(R.drawable.charge_button_drawable));
+                        //play sound if sound hasn't been played yet
+                        if (!LevelInfo.powerSoundPlayed) {
+                            LevelInfo.powerSoundPlayed = true;
+                            LevelInfo.soundPool.play(LevelInfo.powerReadySoundId, (PlayerInfo.soundLevel * 0.8f), (PlayerInfo.soundLevel * 0.8f), 0, 0, 1);
+                        }
                     }
                     //if power is active and player has made a match
                     if (Player.PlayerInfo.powerActivated && movingSquare.matches != 0) {
@@ -341,6 +393,7 @@ public class GameScreen extends AppCompatActivity {
                         powerButton.setBackground(getDrawable(R.drawable.noncharge_button_drawable));
                         LinearLayout chargeLayout = findViewById(R.id.charge_bar_layout);
                         chargeLayout.setBackground(getDrawable(R.drawable.value_text_background));
+                        LevelInfo.powerSoundPlayed = false;
                     }
                     //remove any references to older matches
                     movingSquare.matches = 0;

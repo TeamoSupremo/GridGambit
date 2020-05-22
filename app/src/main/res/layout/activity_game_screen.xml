@@ -144,6 +144,7 @@
         android:layout_marginStart="10dp"
         android:minWidth="0dp"
         android:elevation="-1px"
+        android:onClick="muteSound"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/info_ui_layout"
         android:layout_marginLeft="10dp" />

@@ -113,3 +113,9 @@
 - Added drawables for: grid item shape, good match overlay, bad match overlay
 - Grid items will now change colour after each successful match
 - Grid items now have green border when hovering over matchable item, or red if not
+
+### 22/05
+[Josh]
+- Added sounds
+- Attached sounds to most game actions
+

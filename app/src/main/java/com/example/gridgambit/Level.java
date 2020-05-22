@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
-
 public class Level extends AppCompatActivity {
     LinearLayout infoLayout;
     LinearLayout gameLayout;

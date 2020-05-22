@@ -120,7 +120,7 @@ public class GridUtil {
     public static void winCheck(final Context context, final Level levelUI, final Activity activity){
 
         if (Level.LevelInfo.currentScore >= Level.LevelInfo.targetScore && (Player.PlayerInfo.level != 14) && (Player.PlayerInfo.level != 17) || (Player.PlayerInfo.level == 14 && Level.LevelInfo.currentScore <= Level.LevelInfo.targetScore) || (Player.PlayerInfo.level == 17 && Level.LevelInfo.currentScore <= Level.LevelInfo.targetScore)){
-            //TODO: add sound
+            Level.LevelInfo.soundPool.play(Level.LevelInfo.winSoundId, (Player.PlayerInfo.soundLevel * 0.7f), (Player.PlayerInfo.soundLevel * 0.7f), 0, 0, 1);
             final LinearLayout winScreen = new LinearLayout(context);
             Button mainMenuButton = new Button(context);
             mainMenuButton.setText(R.string.main_menu);
@@ -146,6 +146,8 @@ public class GridUtil {
             mainMenuButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
+                    Level.LevelInfo.soundPool.release();
+                    Level.LevelInfo.soundPool = null;
                     Intent intent = new Intent(v.getContext(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
@@ -185,7 +187,9 @@ public class GridUtil {
             nextLevelButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-                    // TODO: add save player data
+                    Level.LevelInfo.soundPool.release();
+                    Level.LevelInfo.soundPool = null;
+                    DataManager.savePlayerInfo(context);
                     Player.PlayerInfo.levelPassed = false;
                     Intent intent = new Intent(v.getContext(), GameScreen.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -268,7 +272,7 @@ public class GridUtil {
         boolean gridLock = gridLockCheck(levelUI);
 
         if(Level.LevelInfo.currentTurns < 1 || gridLock){
-            // TODO: Add lose sound
+            Level.LevelInfo.soundPool.play(Level.LevelInfo.loseSoundId, Player.PlayerInfo.soundLevel, Player.PlayerInfo.soundLevel, 0, 0, 1);
             LinearLayout loseScreen = new LinearLayout(context);
             Button retryButton = new Button(context);
             retryButton.setText(R.string.retry);
@@ -293,7 +297,8 @@ public class GridUtil {
             retryButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-                    // TODO: release sounds
+                    Level.LevelInfo.soundPool.release();
+                    Level.LevelInfo.soundPool = null;
                     Intent intent = new Intent(v.getContext(), GameScreen.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
@@ -304,8 +309,9 @@ public class GridUtil {
             nextLevelButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-                    // TODO: release sounds
-                    //TODO: save player info in data manager
+                    Level.LevelInfo.soundPool.release();
+                    Level.LevelInfo.soundPool = null;
+                    DataManager.savePlayerInfo(context);
                     Player.PlayerInfo.levelPassed = false;
                     Intent intent = new Intent(v.getContext(), GameScreen.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -317,7 +323,6 @@ public class GridUtil {
             mainMenuButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
-
                     Intent intent = new Intent(v.getContext(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
@@ -425,6 +430,7 @@ public class GridUtil {
     public static void executeCharge(View view, Level levelUI, Context context){
 
         if(Player.PlayerInfo.powerActivated && levelUI.powerChargeBar.getProgress() == 100){
+            Level.LevelInfo.soundPool.play(Level.LevelInfo.powerDeactivatedSoundId, (Player.PlayerInfo.soundLevel * 0.7f), (Player.PlayerInfo.soundLevel * 0.8f), 0, 0, 1);
             Player.PlayerInfo.powerActivated = false;
             Snackbar powerSB = Snackbar.make(view, "Power Deactivated", Snackbar.LENGTH_SHORT);
             View v = powerSB.getView();
@@ -436,6 +442,7 @@ public class GridUtil {
         }
 
         else if(levelUI.powerChargeBar.getProgress() == 100) {
+            Level.LevelInfo.soundPool.play(Level.LevelInfo.powerActivatedSoundId, (Player.PlayerInfo.soundLevel * 0.7f), (Player.PlayerInfo.soundLevel * 0.8f), 0, 0, 1);
             Player.PlayerInfo.powerActivated = true;
             Snackbar powerSB = Snackbar.make(view, "Power Activated", Snackbar.LENGTH_SHORT);
             View v = powerSB.getView();
