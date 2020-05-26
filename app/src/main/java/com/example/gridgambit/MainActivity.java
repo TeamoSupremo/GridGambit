@@ -24,13 +24,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // create SoundPool
         sp = new SoundPool.Builder().setMaxStreams(5).build();
         System.out.print("resetting PlayerInfo: ");
         System.out.println(pi);
+        // create a file for player info
         File file = new File(this.getFilesDir(), "player_info");
-        sp = new SoundPool.Builder().setMaxStreams(5).build();
         Level.LevelInfo.menuClickId = sp.load(this, R.raw.match_made, 1);
         FileInputStream is;
+        // import player info
         try {
             is = openFileInput(file.getName());
             StringBuffer fileContent = new StringBuffer();
@@ -46,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
             String unfilteredPlayerData = String.valueOf(fileContent);
             String[] playerData = unfilteredPlayerData.split(",");
-
             PlayerInfo.level = Integer.parseInt(playerData[0]);
             PlayerInfo.levelHighest = Integer.parseInt(playerData[1]);
 
@@ -101,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
         levelButton.setText(String.valueOf(Player.PlayerInfo.level + 1));
         Button soundButton = findViewById(R.id.sound_button);
         if (PlayerInfo.soundLevel == 1) {
-
             soundButton.setBackground(getDrawable(R.drawable.sound));
 
         } else {

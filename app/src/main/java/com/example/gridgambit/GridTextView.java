@@ -6,7 +6,6 @@ import androidx.appcompat.widget.AppCompatTextView;
 import static java.lang.Integer.parseInt;
 
 public class GridTextView extends AppCompatTextView {
-
     int xLocation = 0;
     int yLocation = 0;
     int matches = 0;
@@ -19,7 +18,6 @@ public class GridTextView extends AppCompatTextView {
     GridTextView firstMatchObject;
     GridTextView secondMatchObject;
     GridTextView thirdMatchObject;
-
 
     public GridTextView(Context context) {
         super(context);
@@ -40,5 +38,4 @@ public class GridTextView extends AppCompatTextView {
     public int getValue() {
         return parseInt(this.getText().toString());
     }
-
 }

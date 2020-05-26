@@ -122,3 +122,9 @@
 [Nathan]
 - saved progress now loads on opening the app
 
+# Week 6
+### 26/05
+[Josh]
+- Fixed some commenting
+- Tidied up code
+

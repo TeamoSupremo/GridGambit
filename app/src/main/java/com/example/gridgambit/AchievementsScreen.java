@@ -37,8 +37,8 @@ public class AchievementsScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.achievements_menu);
 
+        // import saved player data
         FileInputStream is;
-
         try {
             is = openFileInput("player_info");
             StringBuffer fileContent = new StringBuffer();
@@ -54,10 +54,8 @@ public class AchievementsScreen extends AppCompatActivity {
 
             String unfilteredPlayerData = String.valueOf(fileContent);
             String[] playerData = unfilteredPlayerData.split(",");
-
             PlayerInfo.level = Integer.parseInt(playerData[0]);
             PlayerInfo.levelHighest = Integer.parseInt(playerData[1]);
-
 
             for(int i = 0; i < PlayerInfo.achievements.size(); i++){
                 StringBuilder objectConverter = new StringBuilder();
@@ -71,6 +69,7 @@ public class AchievementsScreen extends AppCompatActivity {
 
         String json = null;
 
+        // import achievement data
         try {
             InputStream inputStream = getAssets().open("achievements.json");
             int size = inputStream.available();
@@ -110,6 +109,8 @@ public class AchievementsScreen extends AppCompatActivity {
                 "font/abel.ttf");
 
         assert achievements != null;
+
+        // Create the layout for achievements
         for (int j = 0; j < achievements.length(); j++){
 
             try {
@@ -140,6 +141,7 @@ public class AchievementsScreen extends AppCompatActivity {
                 achievementDescription.setTextColor(Color.parseColor("#bbbbbb"));
                 achievementLayout.getBackground().setColorFilter(Color.rgb(50, 50, 70), PorterDuff.Mode.LIGHTEN);
 
+                // Colour achievements differently if completed
                 if (Objects.equals(PlayerInfo.achievements.get(name), true)) {
                     achievementLayout.getBackground().setColorFilter(null);
                     totalPoints += Integer.parseInt(points);
@@ -158,9 +160,7 @@ public class AchievementsScreen extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
-
         TextView achievementView = findViewById(R.id.achievements_text);
         achievementView.setText(String.format(Locale.getDefault(), "%s %d", getString(R.string.achievement_points), totalPoints));
         achievementView.setTypeface(face);
