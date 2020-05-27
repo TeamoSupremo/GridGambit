@@ -24,33 +24,38 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // create SoundPool
+        // Create SoundPool
         sp = new SoundPool.Builder().setMaxStreams(5).build();
-        System.out.print("resetting PlayerInfo: ");
-        System.out.println(pi);
-        // create a file for player info
+        // Create a file for player info
         File file = new File(this.getFilesDir(), "player_info");
         Level.LevelInfo.menuClickId = sp.load(this, R.raw.match_made, 1);
         FileInputStream is;
-        // import player info
+        // Import player info
         try {
+
+            // Get file and store contents in string
             is = openFileInput(file.getName());
             StringBuffer fileContent = new StringBuffer();
             InputStreamReader isr = new InputStreamReader(is) ;
             BufferedReader buffReader = new BufferedReader(isr) ;
             String readString = buffReader.readLine() ;
 
+            // While there's another line to read in file
             while (readString != null)
             {
+                // Append line to buffer
                 fileContent.append(readString);
                 readString = buffReader.readLine();
             }
 
             String unfilteredPlayerData = String.valueOf(fileContent);
             String[] playerData = unfilteredPlayerData.split(",");
+
+            // Assign loaded content to player variables
             PlayerInfo.level = Integer.parseInt(playerData[0]);
             PlayerInfo.levelHighest = Integer.parseInt(playerData[1]);
 
+            // Load players achievements
             for(int i = 0; i < PlayerInfo.achievements.size(); i++){
                 StringBuilder objectConverter = new StringBuilder();
                 objectConverter.append(Objects.requireNonNull(PlayerInfo.achievements.keySet().toArray())[i]);

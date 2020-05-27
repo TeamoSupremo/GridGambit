@@ -3,12 +3,10 @@ package com.example.gridgambit;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipDescription;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -17,17 +15,13 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import com.example.gridgambit.Level.LevelInfo;
 import com.example.gridgambit.Player.PlayerInfo;
 import org.json.JSONException;
@@ -49,8 +43,10 @@ public class GameScreen extends AppCompatActivity {
         gs = this;
         super.onCreate(savedInstanceState);
 
+        // Create object for playing sounds
         LevelInfo.soundPool = new SoundPool.Builder().setMaxStreams(5).build();
-        //load sounds
+
+        //Load sounds from resource IDs
         LevelInfo.matchMadeSoundId = LevelInfo.soundPool.load(this, R.raw.match_made, 1);
         LevelInfo.gridItemStaticFailSoundId = LevelInfo.soundPool.load(this, R.raw.match_two, 1);
         LevelInfo.powerActivatedSoundId = LevelInfo.soundPool.load(this, R.raw.power_up_two_trimmed, 1);
@@ -60,14 +56,12 @@ public class GameScreen extends AppCompatActivity {
         LevelInfo.winSoundId = LevelInfo.soundPool.load(this, R.raw.win_one, 1);
         LevelInfo.loseSoundId = LevelInfo.soundPool.load(this, R.raw.lose, 1);
 
-        //reset power-ups charge
+        // Reset power-ups charge
         Player.PlayerInfo.powerCharge = 0;
-        //reset players score
+
+        // Reset players score
         Level.LevelInfo.currentScore = 0;
 
-        if (Player.PlayerInfo.level == 17){
-            Level.LevelInfo.currentScore = 100;
-        }
         // Assign UI references
         levelUI = new Level();
         setContentView(R.layout.activity_game_screen);
@@ -82,10 +76,10 @@ public class GameScreen extends AppCompatActivity {
         levelUI.scoreRow = (LinearLayout) levelUI.scoreText.getParent();
         levelUI.soundButton = findViewById(R.id.sound_button);
 
-        //draw sound icon as regular or muted depending on whether user has already muted before starting game
+        // Draw sound icon as regular or muted
+        // Regular/muted depends on player preference "sound level"
         if (PlayerInfo.soundLevel == 1) {
             levelUI.soundButton.setBackground(getDrawable(R.drawable.sound));
-
         } else {
             levelUI.soundButton.setBackground(getDrawable(R.drawable.sound_muted));
         }
@@ -98,22 +92,25 @@ public class GameScreen extends AppCompatActivity {
             levelUI.scoreRow.removeView(levelUI.targetText);
         }
 
+        // Load information relating to current level being played.
         levelUI.data = DataManager.loadLevels(getApplicationContext());
 
         try {
-            //assign level info from JSON
+            // Assign level info from JSON
             Level.LevelInfo.grid = levelUI.data.getJSONArray("value");
             Level.LevelInfo.currentTurns = levelUI.data.getInt("turns");
             Level.LevelInfo.targetScore = levelUI.data.getInt("score");
             GridUtil.updateUI(levelUI, getApplicationContext());
 
+            // Font used for grid items
             Typeface face = Typeface.createFromAsset(getAssets(),
                     "font/akashi.ttf");
 
-            //if the square root of the total number of values is an integer, our grid will be evenly sized
-            if (Math.sqrt(Level.LevelInfo.grid.length()) == (int) Math.sqrt(Level.LevelInfo.grid .length())) {
-
-                //assign square root as grid size
+            // If the square root of the total number of values is an integer
+            if (Math.sqrt(Level.LevelInfo.grid.length()) ==
+            (int) Math.sqrt(Level.LevelInfo.grid.length()))
+            {
+                // Assign square root as grid size
                 Level.LevelInfo.gridSize = (int) Math.sqrt(Level.LevelInfo.grid.length());
             }
 
@@ -142,33 +139,64 @@ public class GameScreen extends AppCompatActivity {
                 // Fill grid rows
                 for (int j = 0; j < Level.LevelInfo.gridSize; j++) {
                     GridTextView gridItem = new GridTextView(this);
-                    gridItem.setText(String.format(Locale.getDefault(), "%d", Level.LevelInfo.grid.getInt(j + (i * Level.LevelInfo.gridSize))));
+
+                    // Set text from data loaded in JSON file
+                    gridItem.setText(String.format(
+                            Locale.getDefault(),
+                            "%d",
+                            Level.LevelInfo.grid.getInt(j + (i * Level.LevelInfo.gridSize)))
+                    );
                     gridItem.setTextColor(Color.parseColor("#1f1f2a"));
                     // Center text
                     gridItem.setGravity(Gravity.CENTER);
                     gridItem.setTextSize(textSize);
-                    // TODO: fix text tize using "setAutoSizeTextTypeUniformWithConfiguration"
+
+                    // TODO: fix text size using "setAutoSizeTextTypeUniformWithConfiguration"
                     //gridItem.setAutoSizeTextTypeUniformWithConfiguration(textSize / 3, textSize, 15, TypedValue.COMPLEX_UNIT_PX);
+
+                    // Stop numbers from appearing on a new line
                     gridItem.setMaxLines(1);
+
+                    // Set font to Akashi
                     gridItem.setTypeface(face);
+
+                    // Set spacing between each grid item
                     gridItem.setLayoutParams(itemParams);
                     itemParams.leftMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
                     itemParams.rightMargin = (int) ((width * ITEM_MARGIN_MODIFIER) / Level.LevelInfo.gridSize);
                     itemParams.topMargin = (int) ((width * ITEM_MARGIN_MODIFIER_TOP) / Level.LevelInfo.gridSize);
                     gridItem.setBackground(getDrawable(R.drawable.grid_item));
-                    //add colour filter to background for match colouring
-                    gridItem.getBackground().setColorFilter(Color.rgb(gridItem.redInBackground, gridItem.greenInBackground, gridItem.blueInBackground), PorterDuff.Mode.OVERLAY);
+
+                    // Add colour overlay for changing grid item colour
+                    // Colour will change based on how high value of grid item is
+                    gridItem.getBackground().setColorFilter(
+                            Color.rgb(
+                                    gridItem.redInBackground,
+                                    gridItem.greenInBackground,
+                                    gridItem.blueInBackground
+                            ),
+                            PorterDuff.Mode.OVERLAY
+                    );
+
+                    // Set grid item position
                     gridItem.xLocation = j;
                     gridItem.yLocation = i;
+
+                    // Set grid item listeners
                     gridItem.setOnTouchListener(new gridTouchListener());
                     gridItem.setOnDragListener(new gridDragListener());
+
                     GridUtil.updateGridItemColour(gridItem);
                     row.addView(gridItem);
                     row.setBaselineAligned(false);
                 }
                 levelUI.gameLayout.addView(row);
             }
-            ConstraintLayout.LayoutParams paramsGameLayout = (ConstraintLayout.LayoutParams) levelUI.gameLayout.getLayoutParams();
+
+            // Set margin and padding for container of grid items
+            ConstraintLayout.LayoutParams paramsGameLayout =
+                    (ConstraintLayout.LayoutParams) levelUI.gameLayout.getLayoutParams();
+
             paramsGameLayout.leftMargin = (int) (width * GAME_MARGIN_MODIFIER);
             paramsGameLayout.rightMargin = (int) (width * GAME_MARGIN_MODIFIER);
             paramsGameLayout.bottomMargin = (int) (width * GAME_MARGIN_MODIFIER);
@@ -180,11 +208,17 @@ public class GameScreen extends AppCompatActivity {
                     (int) (width * GAME_MARGIN_MODIFIER));
 
             levelUI.gameLayout.setLayoutParams(paramsGameLayout);
+
+            // Catch and print problems with reading JSON file
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        // Get reference to charge bar and parent
         LinearLayout chargeBar = findViewById(R.id.charge_bar_layout);
         LinearLayout chargeBarParent = (LinearLayout) chargeBar.getParent();
+
+        // Levels < 4 do not require charge bar, so charge bar is hidden to reduce complexity
         if(Player.PlayerInfo.level < 4 && !Player.PlayerInfo.isEndless) {
             chargeBarParent.removeView(chargeBar);
         }
@@ -194,14 +228,18 @@ public class GameScreen extends AppCompatActivity {
         }
     }
 
+    // On touch listener for grid item
     private static final class gridTouchListener implements View.OnTouchListener {
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint({"ClickableViewAccessibility"})
         @Override
-        //start drag
+
+        // On touching grid item
         public boolean onTouch(View v, MotionEvent event) {
+            // If the event is touching down on grid item
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                // Start drag event
                 ClipData data = ClipData.newPlainText("", "");
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
                 v.startDragAndDrop(data, shadowBuilder, v, 0);
@@ -216,151 +254,385 @@ public class GameScreen extends AppCompatActivity {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         public boolean onDrag(View v, DragEvent event) {
+
+            // grid item being dragged
             GridTextView movingSquare = (GridTextView) event.getLocalState();
+
+            // grid item being dragged over
             GridTextView goalSquare;
             final int action = event.getAction();
 
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-                        //play sound and update background
+                    // If this is the first time the event is running for the drag
+                    if (event.getClipDescription().hasMimeType(
+                            ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                        // Play sound and update background
                         LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
                         updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), movingSquare);
                         return true;
                     }
                     return false;
                 case DragEvent.ACTION_DRAG_ENTERED:
+                    // Assign reference to view being dragged over
                     goalSquare = (GridTextView) v;
+                    // Take not that an extra grid item is now being matched with
                     int nextMatchNumber = movingSquare.matches + 1;
                     switch (movingSquare.matches) {
                         case 0:
-                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare, nextMatchNumber)) {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), movingSquare);
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
-                                //references to matching items
+                            // If match can be made
+                            if (GridUtil.matchCanBeMadeWith(
+                                    movingSquare,
+                                    movingSquare,
+                                    goalSquare,
+                                    nextMatchNumber
+                            )) {
+                                // Add green border to grid items being matched
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_good),
+                                        movingSquare
+                                );
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_good),
+                                        goalSquare
+                                );
+
+                                // References to matching items
                                 movingSquare.firstMatch = goalSquare.getValue();
                                 movingSquare.firstMatchObject = goalSquare;
                                 movingSquare.matches++;
-                                //matching sound
-                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                // Play matching sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.gridItemStaticSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
                                 return true;
                             } else {
+                                // If the first grid item being matched is not the dragging item
                                 if (goalSquare != movingSquare) {
-                                    updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
-                                    LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                    // Add red border to grid item
+                                    updateBackgroundAndFilter(
+                                            getDrawable(R.drawable.grid_item_bad),
+                                            goalSquare
+                                    );
+
+                                    LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId,
+                                            PlayerInfo.soundLevel,
+                                            PlayerInfo.soundLevel,
+                                            0,
+                                            0,
+                                            1
+                                    );
                                 }
                             }
                             break;
                         case 1:
-                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.firstMatchObject, goalSquare, nextMatchNumber)) {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
-                                //references to matching items
+                            // If match can be made
+                            if (GridUtil.matchCanBeMadeWith(
+                                    movingSquare,
+                                    movingSquare.firstMatchObject,
+                                    goalSquare,
+                                    nextMatchNumber
+                            )) {
+                                // Add green border to grid items being matched
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_good),
+                                        goalSquare
+                                );
+
+                                // References to matching items
                                 movingSquare.secondMatch = goalSquare.getValue();
                                 movingSquare.secondMatchObject = goalSquare;
                                 movingSquare.matches++;
-                                //matching sound
-                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                // Play matching sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.gridItemStaticSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
                                 return true;
+                                // Else match cannot be made
                             } else {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
-                                System.out.println("bad applied to: " + goalSquare.xLocation + goalSquare.yLocation);
+                                // Remove green border
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item)
+                                        , movingSquare.firstMatchObject
+                                );
+                                // Add red border to grid items being matched
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_bad),
+                                        goalSquare
+                                );
                                 movingSquare.matches--;
-                                //matching sound
-                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                // Play match fail sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.gridItemStaticFailSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
                             }
                             break;
                         case 2:
-                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.secondMatchObject, goalSquare, nextMatchNumber)) {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
-                                //references to matching items
+                            // If match can be made
+                            if (GridUtil.matchCanBeMadeWith(
+                                    movingSquare,
+                                    movingSquare.secondMatchObject,
+                                    goalSquare,
+                                    nextMatchNumber
+                            )) {
+                                // Add green border to grid items being matched
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_good),
+                                        goalSquare
+                                );
+                                // References to matching items
                                 movingSquare.thirdMatch = goalSquare.getValue();
                                 movingSquare.thirdMatchObject = goalSquare;
                                 movingSquare.matches++;
-                                //matching sound
-                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                // Play matching sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.gridItemStaticSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
                                 return true;
                             } else {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.secondMatchObject);
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
+
+                                // Remove green border
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item),
+                                        movingSquare.firstMatchObject
+                                );
+
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item),
+                                        movingSquare.secondMatchObject
+                                );
+
+                                // Add red border to grid items being matched
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_bad),
+                                        goalSquare
+                                );
                                 movingSquare.matches--;
-                                //matching sound
-                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                // Play matching failed sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.gridItemStaticFailSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
                             }
                             break;
                         case 3:
-                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.thirdMatchObject, goalSquare, nextMatchNumber)) {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_good), goalSquare);
+                            // If match can be made
+                            if (GridUtil.matchCanBeMadeWith(
+                                    movingSquare,
+                                    movingSquare.thirdMatchObject,
+                                    goalSquare,
+                                    nextMatchNumber
+                            )) {
+                                // Add green border to grid items being matched
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_good),
+                                        goalSquare
+                                );
                                 movingSquare.matches++;
-                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                // Play matching sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.gridItemStaticSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
                                 return true;
                             } else {
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.firstMatchObject);
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.secondMatchObject);
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), movingSquare.thirdMatchObject);
-                                updateBackgroundAndFilter(getDrawable(R.drawable.grid_item_bad), goalSquare);
+                                // Remove green border
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item),
+                                        movingSquare.firstMatchObject
+                                );
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item),
+                                        movingSquare.secondMatchObject
+                                );
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item),
+                                        movingSquare.thirdMatchObject
+                                );
+
+                                // Add red border to grid items being matched
+                                updateBackgroundAndFilter(
+                                        getDrawable(R.drawable.grid_item_bad),
+                                        goalSquare
+                                );
                                 movingSquare.matches--;
-                                //matching sound
-                                LevelInfo.soundPool.play(LevelInfo.gridItemStaticFailSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
+
+                                // Play matching failed sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.gridItemStaticFailSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
                             }
                             return true;
                     }
                     return true;
                 case DragEvent.ACTION_DRAG_EXITED:
+
                     goalSquare = (GridTextView) v;
-                    if (goalSquare != movingSquare.firstMatchObject && goalSquare != movingSquare.secondMatchObject && goalSquare != movingSquare.thirdMatchObject) {
-                        updateBackgroundAndFilter(getDrawable(R.drawable.grid_item), goalSquare);
+
+                    // if player is not dragging back towards matching items
+                    if (goalSquare != movingSquare.firstMatchObject &&
+                            goalSquare != movingSquare.secondMatchObject &&
+                            goalSquare != movingSquare.thirdMatchObject
+                    ) {
+                        // Remove green border
+                        updateBackgroundAndFilter(
+                                getDrawable(R.drawable.grid_item),
+                                goalSquare
+                        );
                     }
                     return true;
+
                 case DragEvent.ACTION_DROP:
                     goalSquare = (GridTextView) v;
-                    switch (movingSquare.matches) {
 
+                    switch (movingSquare.matches) {
                         case 1:
-                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare, goalSquare)) {
+                            // If match can be made
+                            if (GridUtil.matchCanBeMadeWith(
+                                    movingSquare,
+                                    movingSquare,
+                                    goalSquare))
+                            {
+                                // The player has used a turn
                                 Level.LevelInfo.currentTurns--;
-                                LevelInfo.soundPool.play(LevelInfo.matchMadeSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
-                                //total value for element and score
+
+                                // Play match made sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.matchMadeSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
+
+                                // Total value for element and score
                                 int sequence = movingSquare.getValue() + movingSquare.firstMatch;
                                 String sequenceString = sequence + "";
-                                //change value displayed to be the total value of all matches
+
+                                // Change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
                                 Player.PlayerInfo.powerCharge += sequence * 4;
+
+                                // Update grid item colour
                                 GridUtil.updateUI(levelUI, getApplicationContext());
                                 GridUtil.updateGridItemColour(movingSquare);
                                 GridUtil.updateGridItemColour(goalSquare);
                             }
                             break;
                         case 2:
-                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.firstMatchObject, goalSquare)) {
+                            // If match can be made
+                            if (GridUtil.matchCanBeMadeWith(
+                                    movingSquare,
+                                    movingSquare.firstMatchObject,
+                                    goalSquare
+                            )) {
+                                // Player has used a turn
                                 Level.LevelInfo.currentTurns--;
-                                LevelInfo.soundPool.play(LevelInfo.matchMadeSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
-                                //total value for element and score
-                                int sequence = movingSquare.getValue() + movingSquare.firstMatch + movingSquare.secondMatch;
+
+                                // Play match made sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.matchMadeSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
+
+                                // Total value for element and score
+                                int sequence = movingSquare.getValue() +
+                                        movingSquare.firstMatch +
+                                        movingSquare.secondMatch;
+
                                 String sequenceString = sequence + "";
-                                //change value displayed to be the total value of all matches
+                                // Change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
                                 Player.PlayerInfo.powerCharge += sequence * 4;
+
+                                // Update grid items colour
                                 GridUtil.updateUI(levelUI, getApplicationContext());
                                 GridUtil.updateGridItemColour(goalSquare);
                                 GridUtil.updateGridItemColour(movingSquare);
                                 GridUtil.updateGridItemColour(movingSquare.firstMatchObject);
                             }
                             break;
+
                         case 3:
-                            if (GridUtil.matchCanBeMadeWith(movingSquare, movingSquare.secondMatchObject, goalSquare)) {
+                            // If a match can be made
+                            if (GridUtil.matchCanBeMadeWith(
+                                    movingSquare,
+                                    movingSquare.secondMatchObject,
+                                    goalSquare
+                            )) {
+                                // Player has used a turn
                                 Level.LevelInfo.currentTurns--;
-                                LevelInfo.soundPool.play(LevelInfo.matchMadeSoundId, PlayerInfo.soundLevel, PlayerInfo.soundLevel, 0, 0, 1);
-                                //total value for element and score
-                                int sequence = movingSquare.getValue() + movingSquare.firstMatch + movingSquare.secondMatch + movingSquare.thirdMatch;
+
+                                // Play match made sound
+                                LevelInfo.soundPool.play(
+                                        LevelInfo.matchMadeSoundId,
+                                        PlayerInfo.soundLevel,
+                                        PlayerInfo.soundLevel,
+                                        0,
+                                        0,
+                                        1
+                                );
+
+                                // Total value for element and score
+                                int sequence = movingSquare.getValue() +
+                                        movingSquare.firstMatch +
+                                        movingSquare.secondMatch +
+                                        movingSquare.thirdMatch;
                                 String sequenceString = sequence + "";
-                                //change value displayed to be the total value of all matches
+
+                                // Change value displayed to be the total value of all matches
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
                                 Player.PlayerInfo.powerCharge += sequence * 4;
+
+                                // Update grid items colour
                                 GridUtil.updateUI(levelUI, getApplicationContext());
                                 GridUtil.updateGridItemColour(goalSquare);
                                 GridUtil.updateGridItemColour(movingSquare);
@@ -369,33 +641,33 @@ public class GameScreen extends AppCompatActivity {
                             }
                             break;
                     }
-                    //if charge is full and player hasn't activated power-up
+                    // If charge is full and player hasn't activated power-up
                     if (levelUI.powerChargeBar.getProgress() == 100 && !Player.PlayerInfo.powerActivated) {
-                        //switch background
+                        // Switch background
                         Button powerButton = findViewById(R.id.power_charge_button);
                         powerButton.setBackground(getDrawable(R.drawable.charge_button_drawable));
-                        //play sound if sound hasn't been played yet
+                        // Play sound if sound hasn't been played yet
                         if (!LevelInfo.powerSoundPlayed) {
                             LevelInfo.powerSoundPlayed = true;
                             LevelInfo.soundPool.play(LevelInfo.powerReadySoundId, (PlayerInfo.soundLevel * 0.8f), (PlayerInfo.soundLevel * 0.8f), 0, 0, 1);
                         }
                     }
-                    //if power is active and player has made a match
+                    // If power is active and player has made a match
                     if (Player.PlayerInfo.powerActivated && movingSquare.matches != 0) {
-                        //deactivate power up and reduce charge to 0
+                        // Deactivate power up and reduce charge to 0
                         Player.PlayerInfo.powerActivated = false;
                         Player.PlayerInfo.powerCharge = 0;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             levelUI.powerChargeBar.setProgress(Player.PlayerInfo.powerCharge, true);
                         }
-                        //switch UI back to normal
+                        // Switch UI back to normal
                         Button powerButton = findViewById(R.id.power_charge_button);
                         powerButton.setBackground(getDrawable(R.drawable.noncharge_button_drawable));
                         LinearLayout chargeLayout = findViewById(R.id.charge_bar_layout);
                         chargeLayout.setBackground(getDrawable(R.drawable.value_text_background));
                         LevelInfo.powerSoundPlayed = false;
                     }
-                    //remove any references to older matches
+                    // Remove any references to older matches
                     movingSquare.matches = 0;
                     movingSquare.firstMatchObject = null;
                     movingSquare.secondMatchObject = null;
