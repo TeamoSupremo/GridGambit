@@ -128,3 +128,8 @@
 - Fixed some commenting
 - Tidied up code
 
+### 27/05
+[Nathan]
+- GameScreen code reformatting
+- GameScreen code commenting
+
