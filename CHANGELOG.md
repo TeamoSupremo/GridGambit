@@ -133,3 +133,9 @@
 - GameScreen code reformatting
 - GameScreen code commenting
 
+# Week 7
+### 1/06
+[Josh]
+- Removed last 5 levels and corresponding achievements
+- Achievements check implemented and working
+- Added credits for images and sounds

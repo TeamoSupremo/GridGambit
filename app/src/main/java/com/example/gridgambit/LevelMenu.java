@@ -69,7 +69,7 @@ public class LevelMenu extends AppCompatActivity {
 
         // get the player's current progress
         if(!PlayerInfo.isEndless) {
-            levelsCompleted = PlayerInfo.levelHighest;
+            levelsCompleted = PlayerInfo.levelHighest + 1;
         }
 
         final LinearLayout levelLayout = findViewById(R.id.level_layout);

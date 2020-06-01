@@ -99,8 +99,8 @@ public class GridUtil {
     }
 
     private static void achievementCheck(Context context){
-        //if the player beats level 10 and the difficulty is on easy
-        if ((!Player.PlayerInfo.isEndless) && Player.PlayerInfo.level >= 20) {
+        //if the player beats level 14 and the difficulty is on easy
+        if ((!Player.PlayerInfo.isEndless) && Player.PlayerInfo.level >= 14) {
             //award the first achievement
             Player.PlayerInfo.achievements.put("master", true);
         }
@@ -260,7 +260,8 @@ public class GridUtil {
             winScreen.setGravity(Gravity.END | Gravity.CENTER);
             closeButton.setLayoutParams(paramsCloseButton);
 
-            // TODO: add achievement check
+            // check if achievements have been earned
+            achievementCheck(context);
         }
         else{
             loseCheck(context, levelUI, activity);

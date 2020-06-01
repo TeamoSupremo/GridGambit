@@ -30,13 +30,6 @@
     },
 
     {
-      "title" : "AM I DOING IT RIGHT?",
-      "name" : "amIDoingItRight",
-      "description" : "Score under -50 points on level 19",
-      "points" : 50
-    },
-
-    {
       "title" : "EZ",
       "name" : "EZ",
       "description" : "Complete a challenge mode level with 0 turns left",

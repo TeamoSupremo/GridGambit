@@ -30,6 +30,7 @@
         android:minHeight="0dp"
         android:layout_margin="10dp"
         android:minWidth="0dp"
+        android:onClick="loadInfo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/challenge_mode_layout"
         />

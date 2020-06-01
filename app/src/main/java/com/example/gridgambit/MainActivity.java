@@ -94,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void loadInfo(View view){
+        Intent intent = new Intent(this, InfoScreen.class);
+        startActivity(intent);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void muteSound(View view){
         SoundManager.muteSound(view, this, getApplicationContext());

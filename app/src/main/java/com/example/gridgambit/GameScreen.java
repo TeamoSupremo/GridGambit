@@ -631,7 +631,8 @@ public class GameScreen extends AppCompatActivity {
                                 goalSquare.setText(sequenceString);
                                 Level.LevelInfo.currentScore += sequence;
                                 Player.PlayerInfo.powerCharge += sequence * 4;
-
+                                // give player achievement
+                                PlayerInfo.achievements.put("noSweat", true);
                                 // Update grid items colour
                                 GridUtil.updateUI(levelUI, getApplicationContext());
                                 GridUtil.updateGridItemColour(goalSquare);
@@ -672,6 +673,13 @@ public class GameScreen extends AppCompatActivity {
                     movingSquare.firstMatchObject = null;
                     movingSquare.secondMatchObject = null;
                     movingSquare.thirdMatchObject = null;
+
+                    // award achievement for endless mode
+                    if (LevelInfo.currentScore >= 3000 && PlayerInfo.isEndless) {
+                        PlayerInfo.achievements.put("unstoppable", true);
+                        DataManager.savePlayerInfo(getApplicationContext());
+                    }
+
                     GridUtil.winCheck(getApplicationContext(), levelUI, gs);
                     return true;
                 case DragEvent.ACTION_DRAG_ENDED:
