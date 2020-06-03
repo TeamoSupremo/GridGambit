@@ -139,3 +139,7 @@
 - Removed last 5 levels and corresponding achievements
 - Achievements check implemented and working
 - Added credits for images and sounds
+
+[Nathan]
+- Added more commenting to gridUtil class
+- added background art for main menu screen
