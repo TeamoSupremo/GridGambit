@@ -144,3 +144,6 @@
 [Nathan]
 - Added more commenting to gridUtil class
 - added background art for main menu screen
+
+[Josh]
+- Added check for full power to prevent grid lock

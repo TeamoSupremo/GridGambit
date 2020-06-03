@@ -61,6 +61,10 @@ public class GridUtil {
     }
 
     private static boolean gridLockCheck(Level levelUI) {
+        // if the player has 100 power, grid is never locked
+        if(Player.PlayerInfo.powerCharge == 100){
+            return false;
+        }
 
         //start as true, if a single move can be made, assign false
         boolean gridLock = true;
