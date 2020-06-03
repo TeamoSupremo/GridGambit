@@ -140,6 +140,7 @@
 - Achievements check implemented and working
 - Added credits for images and sounds
 
+### 3/06
 [Nathan]
 - Added more commenting to gridUtil class
 - added background art for main menu screen
