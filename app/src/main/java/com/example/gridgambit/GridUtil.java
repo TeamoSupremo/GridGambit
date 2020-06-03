@@ -62,8 +62,6 @@ public class GridUtil {
 
     private static boolean gridLockCheck(Level levelUI) {
 
-        // TODO: Add check of Powerbar at 100
-
         //start as true, if a single move can be made, assign false
         boolean gridLock = true;
 
@@ -119,8 +117,26 @@ public class GridUtil {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void winCheck(final Context context, final Level levelUI, final Activity activity){
 
-        if (Level.LevelInfo.currentScore >= Level.LevelInfo.targetScore && (Player.PlayerInfo.level != 14) && (Player.PlayerInfo.level != 17) || (Player.PlayerInfo.level == 14 && Level.LevelInfo.currentScore <= Level.LevelInfo.targetScore) || (Player.PlayerInfo.level == 17 && Level.LevelInfo.currentScore <= Level.LevelInfo.targetScore)){
-            Level.LevelInfo.soundPool.play(Level.LevelInfo.winSoundId, (Player.PlayerInfo.soundLevel * 0.7f), (Player.PlayerInfo.soundLevel * 0.7f), 0, 0, 1);
+        // If player has reached target score (includes odd cases for 14 and 17)
+        if (Level.LevelInfo.currentScore >= Level.LevelInfo.targetScore &&
+                (Player.PlayerInfo.level != 14) &&
+                (Player.PlayerInfo.level != 17) ||
+                (Player.PlayerInfo.level == 14 &&
+                        Level.LevelInfo.currentScore <= Level.LevelInfo.targetScore) ||
+                (Player.PlayerInfo.level == 17
+                        && Level.LevelInfo.currentScore <= Level.LevelInfo.targetScore
+                )
+        ){
+            // Play win sound
+            Level.LevelInfo.soundPool.play(
+                    Level.LevelInfo.winSoundId,
+                    (Player.PlayerInfo.soundLevel * 0.7f),
+                    (Player.PlayerInfo.soundLevel * 0.7f),
+                    0,
+                    0,
+                    1
+            );
+            // Create win screen layout overlay
             final LinearLayout winScreen = new LinearLayout(context);
             Button mainMenuButton = new Button(context);
             mainMenuButton.setText(R.string.main_menu);
@@ -156,6 +172,7 @@ public class GridUtil {
                 }
             });
 
+            // Set mode to endless if choosing to continue after completing level
             closeButton.setOnClickListener(new View.OnClickListener() {
 
                 public void onClick(View v) {
@@ -217,6 +234,7 @@ public class GridUtil {
                 winMessage.setText(R.string.finish);
             }
 
+            // If player has passed final level
             if(Player.PlayerInfo.level < Level.LevelInfo.levelArray.length()-1){
                 winScreen.setOrientation(LinearLayout.VERTICAL);
                 winScreen.addView(closeButton);
@@ -239,6 +257,7 @@ public class GridUtil {
             constraintLayout.addView(winScreen);
             winScreen.setElevation(100);
 
+            // Display win screen
             float density = context.getResources().getDisplayMetrics().density;
             int layoutMargin = (int) (50 * density + 0.5f);
             ConstraintSet cs = new ConstraintSet();
@@ -338,7 +357,7 @@ public class GridUtil {
                 else{
                     loseMessage.setText(R.string.gridlock);
                 }
-                //else loss is because of no turns left
+                // else loss is because of no turns left
             } else {
                 loseMessage.setText(R.string.lf_no_more_turns);
             }
@@ -379,9 +398,9 @@ public class GridUtil {
         }
     }
 
-    //changes colour based on value in gridItem
+    // Changes colour based on value in gridItem
     public static void updateGridItemColour(GridTextView gridItem){
-        //blue
+        // blue
         if(gridItem.getValue() <= 12){
             gridItem.redInBackground = (200 - gridItem.getValue() * 15);
             gridItem.greenInBackground = (200 - gridItem.getValue() * 15);
@@ -392,20 +411,20 @@ public class GridUtil {
                 gridItem.blueInBackground = 255;
             }
         }
-        //purple
+        // purple
         else if(gridItem.getValue() <= 24){
             gridItem.redInBackground = (gridItem.getValue() * 8);
             gridItem.greenInBackground = 50;
             gridItem.blueInBackground = 255;
 
         }
-        //red
+        // red
         else if(gridItem.getValue() <= 36){
             gridItem.redInBackground = (50 + gridItem.getValue() * 5);
             gridItem.greenInBackground = 0;
             gridItem.blueInBackground = (int) (255 * (1 - (gridItem.getValue() / 36.0)));
         }
-        //orange
+        // orange
         else if(gridItem.getValue() <= 48){
             gridItem.redInBackground = 255;
             gridItem.greenInBackground = ((gridItem.getValue() - 36) * 15);
@@ -416,7 +435,7 @@ public class GridUtil {
                 gridItem.greenInBackground = 255;
             }
         }
-        //yellow -> white
+        // yellow -> white
         else{
             gridItem.redInBackground = 255;
             gridItem.greenInBackground = 180;
